@@ -16,10 +16,9 @@ namespace InformationRetrieval.Index
 
             foreach (var token in tokens)
             {
-                Term term;
                 bool found_term = false;
 
-                if (Terms.TryGetValue(token.Value, out term) == true)
+                if (Terms.TryGetValue(token.Value, out Term term) == true)
                 {
                     found_term = true;
                 }

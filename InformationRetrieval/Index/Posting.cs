@@ -12,6 +12,7 @@ namespace InformationRetrieval.Index
         }
 
         public string Document { get; set; }
+
         public int CompareTo(object obj)
         {
             Posting b = (Posting) obj;

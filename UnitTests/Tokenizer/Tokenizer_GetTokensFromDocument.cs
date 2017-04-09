@@ -82,11 +82,23 @@ namespace UnitTests
         }
 
         [Fact]
-        public void Tokenizer_GetTokensFromDocument_NegativeTest()
+        public void Tokenizer_GetTokensFromDocument_IsEmpty()
         {
             var tokenizer = new Tokenizer();
 
             string documentContent = string.Empty;
+
+            var tokenList = tokenizer.GetTokensFromDocument(documentContent);
+
+            tokenList.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void Tokenizer_GetTokensFromDocument_IsNull()
+        {
+            var tokenizer = new Tokenizer();
+
+            string documentContent = null;
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 

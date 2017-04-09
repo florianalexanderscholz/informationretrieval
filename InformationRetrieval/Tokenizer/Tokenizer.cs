@@ -3,7 +3,7 @@
 namespace InformationRetrieval.Tokenizer
 {
     /// <summary>
-    /// Tokenizer Implementatino for P1
+    /// Tokenizer Implementation for P1
     /// </summary>
     public class Tokenizer : ITokenizer
     {

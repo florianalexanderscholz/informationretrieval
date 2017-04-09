@@ -80,5 +80,17 @@ namespace UnitTests
 
             tokenList.ShouldAllBeEquivalentTo(referenceTokenList);
         }
+
+        [Fact]
+        public void Tokenizer_GetTokensFromDocument_NegativeTest()
+        {
+            var tokenizer = new Tokenizer();
+
+            string documentContent = string.Empty;
+
+            var tokenList = tokenizer.GetTokensFromDocument(documentContent);
+
+            tokenList.Should().BeEmpty();
+        }
     }
 }

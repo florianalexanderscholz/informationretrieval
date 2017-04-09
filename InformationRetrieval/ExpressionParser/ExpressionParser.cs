@@ -2,58 +2,61 @@
 {
     public class ExpressionParser : IExpressionParser
     {
+        public char DelimiterOr { get; set; } = '|';
+        public char DelimiterAnd { get; set; } = ',';
+        public char PrefixNegative { get; set; } = '!';
+
         public DNFExpression ParseExpression(string expression)
         {
             if (string.IsNullOrEmpty(expression))
             {
                 return new DNFExpression();
             }
-            else
+
+            var rawDisjunctionList = expression.Split(DelimiterOr);
+
+            DNFExpression dnfExpression = new DNFExpression();
+
+            foreach (var rawDisjunction in rawDisjunctionList)
             {
-                var andExpressions = expression.Split('|');
-
-                DNFExpression dnfExpression = new DNFExpression();
-
-                foreach (var subExpression in andExpressions)
+                if (string.IsNullOrEmpty(rawDisjunction))
                 {
-                    if (string.IsNullOrEmpty(subExpression))
+                    continue;
+                }
+
+                Conjunction andExpression = new Conjunction();
+
+                var conjunctionList = rawDisjunction.Split(DelimiterAnd);
+
+                foreach (var conjunction in conjunctionList)
+                {
+                    if (string.IsNullOrEmpty(conjunction))
                     {
                         continue;
                     }
 
-                    AndExpression andExpression = new AndExpression();
+                    string value = conjunction;
 
-                    var variablesExpression = subExpression.Split(',');
-
-                    foreach (var variable in variablesExpression)
+                    /* Adding support for negative AND */
+                    bool negative = false;
+                    if (value[0] == PrefixNegative)
                     {
-                        if (string.IsNullOrEmpty(variable))
-                        {
-                            continue;
-                        }
-
-                        string value = variable;
-
-                        bool negative = false;
-                        if (value[0] == '!')
-                        {
-                            negative = true;
-                            value = value.Substring(1);
-                        }
-
-                        Variable variableExpression = new Variable(value)
-                        {
-                            Negative = negative
-                        };
-
-                        andExpression.Variables.Add(variableExpression);
+                        negative = true;
+                        value = value.Substring(1);
                     }
 
-                    dnfExpression.SubExpressions.Add(andExpression);
+                    Variable variableExpression = new Variable(value)
+                    {
+                        Negative = negative
+                    };
+
+                    andExpression.Variables.Add(variableExpression);
                 }
 
-                return dnfExpression;
+                dnfExpression.Conjunctions.Add(andExpression);
             }
+
+            return dnfExpression;
         }
     }
 }

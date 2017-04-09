@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using InformationRetrieval.ExpressionParser;
-using NSubstitute;
 using Xunit;
 
 namespace UnitTests.ExpressionParser
@@ -19,9 +16,9 @@ namespace UnitTests.ExpressionParser
 
             var referenceBooleanExpression = new DNFExpression()
             {
-                SubExpressions = new List<AndExpression>()
+                Conjunctions = new List<Conjunction>()
                 {
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
@@ -50,9 +47,9 @@ namespace UnitTests.ExpressionParser
 
             var referenceBooleanExpression = new DNFExpression()
             {
-                SubExpressions = new List<AndExpression>()
+                Conjunctions = new List<Conjunction>()
                 {
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
@@ -60,7 +57,7 @@ namespace UnitTests.ExpressionParser
                             new Variable("Prinzessin")
                         }
                     },
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
@@ -84,9 +81,9 @@ namespace UnitTests.ExpressionParser
 
             var referenceBooleanExpression = new DNFExpression()
             {
-                SubExpressions = new List<AndExpression>()
+                Conjunctions = new List<Conjunction>()
                 {
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
@@ -94,7 +91,7 @@ namespace UnitTests.ExpressionParser
                             new Variable("Prinzessin")
                         }
                     },
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
@@ -119,9 +116,9 @@ namespace UnitTests.ExpressionParser
 
             var referenceBooleanExpression = new DNFExpression()
             {
-                SubExpressions = new List<AndExpression>()
+                Conjunctions = new List<Conjunction>()
                 {
-                    new AndExpression()
+                    new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {

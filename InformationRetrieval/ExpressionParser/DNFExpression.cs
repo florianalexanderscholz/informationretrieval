@@ -10,6 +10,6 @@ namespace InformationRetrieval.ExpressionParser
         /// <summary>
         /// Stores the AND expressions.
         /// </summary>
-        public List<AndExpression> SubExpressions { get; set; } = new List<AndExpression>();
+        public List<Conjunction> Conjunctions { get; set; } = new List<Conjunction>();
     }
 }

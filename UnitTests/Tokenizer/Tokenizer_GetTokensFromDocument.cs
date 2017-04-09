@@ -1,23 +1,18 @@
-using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using Castle.Core.Configuration;
 using FluentAssertions;
 using InformationRetrieval.Tokenizer;
-using NSubstitute;
 using Xunit;
 
-namespace UnitTests
+namespace UnitTests.Tokenizer
 {
     public class Tokenizer_GetTokensFromDocument
     {
         [Fact]
         public void Tokenizer_GetTokensFromDocument_Positive()
         {
-            var tokenizer = new Tokenizer();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
-            string documentContent =
-                @"Die Frau hatte zwei Töchter.";
+            const string documentContent = @"Die Frau hatte zwei Töchter.";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 
@@ -37,10 +32,9 @@ namespace UnitTests
         [Fact]
         public void Tokenizer_GetTokensFromDocument_TestDelimiters()
         {
-            var tokenizer = new Tokenizer();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
-            string documentContent =
-                "\"Baum\", sprach Jan, rüttel' dich.";
+            const string documentContent = "\"Baum\", sprach Jan, rüttel' dich.";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 
@@ -60,10 +54,9 @@ namespace UnitTests
         [Fact]
         public void Tokenizer_GetTokensFromDocument_LineSeparation()
         {
-            var tokenizer = new Tokenizer();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
-            string documentContent =
-                @"Mordor: 
+            const string documentContent = @"Mordor: 
                     Der Ring gehört uns!";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
@@ -84,7 +77,7 @@ namespace UnitTests
         [Fact]
         public void Tokenizer_GetTokensFromDocument_IsEmpty()
         {
-            var tokenizer = new Tokenizer();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
             string documentContent = string.Empty;
 
@@ -96,11 +89,9 @@ namespace UnitTests
         [Fact]
         public void Tokenizer_GetTokensFromDocument_IsNull()
         {
-            var tokenizer = new Tokenizer();
-
-            string documentContent = null;
-
-            var tokenList = tokenizer.GetTokensFromDocument(documentContent);
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            
+            var tokenList = tokenizer.GetTokensFromDocument(null);
 
             tokenList.Should().BeEmpty();
         }

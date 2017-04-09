@@ -118,22 +118,14 @@ namespace UnitTests.Index
             dictionary.ShouldBeEquivalentTo(referenceDictionary);
         }
 
-        [Fact]
-        public void Index_InsertPostings_FilenameNull()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Index_InsertPostings_FilenameNull(string filename)
         {
             InformationRetrieval.Index.Index index = new InformationRetrieval.Index.Index();
 
-            index.InsertPostings(new List<Token>(), null);
-
-            index.Terms.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void Index_InsertPostings_FilenameEmpty()
-        {
-            InformationRetrieval.Index.Index index = new InformationRetrieval.Index.Index();
-
-            index.InsertPostings(new List<Token>(), string.Empty);
+            index.InsertPostings(new List<Token>(), filename);
 
             index.Terms.Should().BeEmpty();
         }

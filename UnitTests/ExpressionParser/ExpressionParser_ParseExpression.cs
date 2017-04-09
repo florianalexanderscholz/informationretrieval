@@ -10,9 +10,14 @@ namespace UnitTests.ExpressionParser
         [Fact]
         public void ExpressionParser_ParseExpression_ParseOneAndExpression()
         {
-            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser()
+            {
+                DelimiterAnd = '&',
+                DelimiterOr = '|',
+                PrefixNegative = '!'
+            };
 
-            var dnfExpression = expressionParser.ParseExpression("|Hexe,Prinzessin|");
+            var dnfExpression = expressionParser.ParseExpression("|Hexe&Prinzessin&||");
 
             var referenceBooleanExpression = new DNFExpression()
             {

@@ -35,5 +35,21 @@ namespace InformationRetrieval.Index
                 }
             }
         }
+
+        public bool GetPosting(string token, out Term term)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                term = null;
+                return false;
+            }
+
+            if (Terms.TryGetValue(token, out term) == false)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

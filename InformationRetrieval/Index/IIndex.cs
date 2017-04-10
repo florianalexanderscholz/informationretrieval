@@ -5,8 +5,10 @@ using InformationRetrieval.Tokenizer;
 
 namespace InformationRetrieval.Index
 {
-    interface IIndex
+    public interface IIndex
     {
         void InsertPostings(List<Token> tokens, string filename);
+
+        bool GetPosting(string token, out Term term);
     }
 }

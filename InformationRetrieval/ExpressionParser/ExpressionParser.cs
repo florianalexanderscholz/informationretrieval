@@ -35,7 +35,7 @@
                         continue;
                     }
 
-                    string value = conjunction;
+                    string value = conjunction.ToLower();
 
                     /* Adding support for negative AND */
                     bool negative = false;

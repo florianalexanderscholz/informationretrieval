@@ -92,16 +92,16 @@ namespace UnitTests.ExpressionParser
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("Hexe"),
-                            new Variable("Prinzessin")
+                            new Variable("hexe"),
+                            new Variable("prinzessin")
                         }
                     },
                     new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("König"),
-                            new Variable("Hexe")
+                            new Variable("könig"),
+                            new Variable("hexe")
                             {
                                 Negative = true
                             },

@@ -49,6 +49,30 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
+        public void QueryProcessor_EvaluateExpression_Case021()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+
+            var documents = queryProcessor.EvaluateExpression("|Troll|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A"),
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
+        [Fact]
         public void QueryProcessor_EvaluateExpression_Case03()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();

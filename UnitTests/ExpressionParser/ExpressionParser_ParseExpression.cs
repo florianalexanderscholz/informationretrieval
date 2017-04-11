@@ -27,11 +27,11 @@ namespace UnitTests.ExpressionParser
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("Hexe")
+                            new Variable("hexe")
                             {
                                 Negative = false
                             },
-                            new Variable("Prinzessin")
+                            new Variable("prinzessin")
                             {
                                 Negative = false
                             }
@@ -58,17 +58,17 @@ namespace UnitTests.ExpressionParser
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("Hexe"),
-                            new Variable("Prinzessin")
+                            new Variable("hexe"),
+                            new Variable("prinzessin")
                         }
                     },
                     new Conjunction()
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("Frosch"),
-                            new Variable("König"),
-                            new Variable("Tellerlein"),
+                            new Variable("frosch"),
+                            new Variable("könig"),
+                            new Variable("tellerlein"),
                         }
                     }
                 }
@@ -127,7 +127,7 @@ namespace UnitTests.ExpressionParser
                     {
                         Variables = new List<Variable>()
                         {
-                            new Variable("Hexe"),
+                            new Variable("hexe"),
                         }
                     }
                 }

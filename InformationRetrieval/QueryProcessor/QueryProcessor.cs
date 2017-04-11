@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
+using InformationRetrieval.PostingListUtils;
 
 namespace InformationRetrieval.QueryProcessor
 {
@@ -35,12 +36,12 @@ namespace InformationRetrieval.QueryProcessor
             {
                 Dictionary<string, SortedSet<Posting>> postingList = new Dictionary<string, SortedSet<Posting>>();
 
-                foreach(var variable in conjunction.Variables)
+                foreach (var variable in conjunction.Variables)
                 {
                     bool receivedValues = indexStorage.GetPosting(variable.Value, out Term term);
                     SortedSet<Posting> postings = new SortedSet<Posting>();
 
-                    if(receivedValues)
+                    if (receivedValues)
                     {
                         foreach (var posting in term.Postings)
                         {
@@ -51,15 +52,30 @@ namespace InformationRetrieval.QueryProcessor
                     postingList.Add(variable.Value, postings);
                 }
 
-                if(postingList.Count == 1)
-                {
-                    var firstPosting = postingList.Values.FirstOrDefault();
+                SortedSet<Posting> postingSet = new SortedSet<Posting>();
 
-                    upperPostings.Add(firstPosting);
+                var currentMergeIterator = postingList.GetEnumerator();
+                if(currentMergeIterator.MoveNext() == false)
+                {
+                    /* No Elements merged */
+                    continue;
                 }
+
+                foreach(var element in currentMergeIterator.Current.Value)
+                {
+                    postingSet.Add(element);
+                }
+
+                while(currentMergeIterator.MoveNext())
+                {
+                    postingSet = postingSet.And(currentMergeIterator.Current.Value);
+                }
+
+                upperPostings.Add(postingSet);
+
             }
 
-            if(upperPostings.Count == 1)
+            if (upperPostings.Count == 1)
             {
                 return upperPostings.FirstOrDefault();
             }

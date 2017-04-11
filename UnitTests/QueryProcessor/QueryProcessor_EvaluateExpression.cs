@@ -27,11 +27,52 @@ namespace UnitTests.QueryProcessor
         public void QueryProcessor_EvaluateExpression_Case02()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
-            var indexStorage = Substitute.For<IIndex>();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
             var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
 
-            queryProcessor.EvaluateExpression("|Hexe,König|", indexStorage);
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+
+            var documents = queryProcessor.EvaluateExpression("|einmal,ein|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A"),
+                new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
         }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_Case03()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+
+            var documents = queryProcessor.EvaluateExpression("|einmal,troll|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A"),
+                new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
 
         [Fact]
         public void QueryProcessor_EvaluateExpression_ExpressionEmpty()

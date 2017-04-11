@@ -1,11 +1,37 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Blend for Visual Studio 15
-VisualStudioVersion = 15.0.26228.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A92817B-AFC2-4091-A58C-474F8F58BE7D}"
 	ProjectSection(SolutionItems) = preProject
+		Documents\Corpus\Aladin und die Wunderlampe.txt = Documents\Corpus\Aladin und die Wunderlampe.txt
+		Documents\Corpus\Ali Baba und die 40 Räuber.txt = Documents\Corpus\Ali Baba und die 40 Räuber.txt
+		Documents\Corpus\Aschenputtel.txt = Documents\Corpus\Aschenputtel.txt
+		Documents\Corpus\Das tapfere Schneiderlein.txt = Documents\Corpus\Das tapfere Schneiderlein.txt
+		Documents\Corpus\Der Drachentöter.txt = Documents\Corpus\Der Drachentöter.txt
+		Documents\Corpus\Der fliegende Holländer.txt = Documents\Corpus\Der fliegende Holländer.txt
+		Documents\Corpus\Der Froschkönig.txt = Documents\Corpus\Der Froschkönig.txt
+		Documents\Corpus\Der gestiefelte Kater.txt = Documents\Corpus\Der gestiefelte Kater.txt
+		Documents\Corpus\Die drei Musikanten.txt = Documents\Corpus\Die drei Musikanten.txt
+		Documents\Corpus\Die goldene Gans.txt = Documents\Corpus\Die goldene Gans.txt
+		Documents\Corpus\Die Loreley.txt = Documents\Corpus\Die Loreley.txt
+		Documents\Corpus\Frau Holle.txt = Documents\Corpus\Frau Holle.txt
+		Documents\Corpus\Hans im Glück.txt = Documents\Corpus\Hans im Glück.txt
+		Documents\Corpus\Hase und Igel.txt = Documents\Corpus\Hase und Igel.txt
+		Documents\Corpus\Hänsel und Gretel.txt = Documents\Corpus\Hänsel und Gretel.txt
 		Documents\INR-P1.pdf = Documents\INR-P1.pdf
+		Documents\Corpus\König Drosselbart.txt = Documents\Corpus\König Drosselbart.txt
+		Documents\Corpus\Mann im Mond.txt = Documents\Corpus\Mann im Mond.txt
+		Documents\Corpus\Peter und der Wolf.txt = Documents\Corpus\Peter und der Wolf.txt
+		Documents\Corpus\Prinzessin auf der Erbse.txt = Documents\Corpus\Prinzessin auf der Erbse.txt
+		Documents\Corpus\Rapunzel.txt = Documents\Corpus\Rapunzel.txt
+		Documents\Corpus\Rotkäppchen.txt = Documents\Corpus\Rotkäppchen.txt
+		Documents\Corpus\Rumpelstilzchen.txt = Documents\Corpus\Rumpelstilzchen.txt
+		Documents\Corpus\Schneewittchen.txt = Documents\Corpus\Schneewittchen.txt
+		Documents\Corpus\Tischlein deck dich.txt = Documents\Corpus\Tischlein deck dich.txt
+		Documents\Corpus\Wolf und die sieben Geißlein.txt = Documents\Corpus\Wolf und die sieben Geißlein.txt
+		Documents\Corpus\Zwerg Nase.txt = Documents\Corpus\Zwerg Nase.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationRetrieval", "InformationRetrieval\InformationRetrieval.csproj", "{C12AB7A7-A04B-4062-885D-7EDA4BCD347C}"

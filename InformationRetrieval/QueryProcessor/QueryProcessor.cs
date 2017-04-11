@@ -52,23 +52,24 @@ namespace InformationRetrieval.QueryProcessor
 
                 SortedSet<Posting> postingSet = new SortedSet<Posting>();
 
-                var currentMergeIterator = postingList.GetEnumerator();
-                if(currentMergeIterator.MoveNext() == false)
+                using (var currentMergeIterator = postingList.GetEnumerator())
                 {
-                    /* No Elements merged */
-                    continue;
-                }
+                    if (currentMergeIterator.MoveNext() == false)
+                    {
+                        /* No Elements merged */
+                        continue;
+                    }
 
-                foreach(var element in currentMergeIterator.Current.Value)
-                {
-                    postingSet.Add(element);
-                }
+                    foreach (var element in currentMergeIterator.Current.Value)
+                    {
+                        postingSet.Add(element);
+                    }
 
-                while(currentMergeIterator.MoveNext())
-                {
-                    postingSet = postingSet.And(currentMergeIterator.Current.Value);
+                    while (currentMergeIterator.MoveNext())
+                    {
+                        postingSet = postingSet.And(currentMergeIterator.Current.Value);
+                    }
                 }
-
                 upperPostings.Add(postingSet);
             }
 
@@ -78,22 +79,23 @@ namespace InformationRetrieval.QueryProcessor
         private SortedSet<Posting> OrMerge(List<SortedSet<Posting>> upperPostings)
         {
             SortedSet<Posting> upperPostingSet = new SortedSet<Posting>();
-            var upperMergeIterator = upperPostings.GetEnumerator();
-            if (upperMergeIterator.MoveNext() == false)
+            using (var upperMergeIterator = upperPostings.GetEnumerator())
             {
-                return upperPostingSet;
-            }
+                if (upperMergeIterator.MoveNext() == false)
+                {
+                    return upperPostingSet;
+                }
 
-            foreach (var element in upperMergeIterator.Current)
-            {
-                upperPostingSet.Add(element);
-            }
+                foreach (var element in upperMergeIterator.Current)
+                {
+                    upperPostingSet.Add(element);
+                }
 
-            while (upperMergeIterator.MoveNext())
-            {
-                upperPostingSet = upperPostingSet.Or(upperMergeIterator.Current);
+                while (upperMergeIterator.MoveNext())
+                {
+                    upperPostingSet = upperPostingSet.Or(upperMergeIterator.Current);
+                }
             }
-
             return upperPostingSet;
         }
     }

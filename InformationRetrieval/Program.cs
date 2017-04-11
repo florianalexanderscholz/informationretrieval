@@ -9,7 +9,7 @@ using SimpleInjector;
 
 namespace InformationRetrieval
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {

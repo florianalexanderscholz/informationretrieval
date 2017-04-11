@@ -10,36 +10,38 @@ namespace InformationRetrieval.PostingListUtils
             {
                 return new SortedSet<Index.Posting>();
             }
-            else
+
+            var answer = new SortedSet<Index.Posting>();
+
+            using (var meEnumerator = me.GetEnumerator())
             {
-                var answer = new SortedSet<Index.Posting>();
-
-                var meEnumerator = me.GetEnumerator();
-                var otherEnumerator = other.GetEnumerator();
-
-                bool meNext = meEnumerator.MoveNext();
-                bool otherNext = otherEnumerator.MoveNext();
-
-                while(meNext == true && otherNext == true)
+                using (var otherEnumerator = other.GetEnumerator())
                 {
-                    if(meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
                     {
-                        answer.Add(meEnumerator.Current);
-                        meNext = meEnumerator.MoveNext();
-                        otherNext = otherEnumerator.MoveNext();
-                    }
-                    else if(string.Compare(meEnumerator.Current.Document,otherEnumerator.Current.Document) < 0)
-                    {
-                        meNext = meEnumerator.MoveNext();
-                    }
-                    else
-                    {
-                        otherNext = otherEnumerator.MoveNext();
+                        if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+                        {
+                            answer.Add(meEnumerator.Current);
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                        else if (string.Compare(meEnumerator.Current.Document,
+                                     otherEnumerator.Current.Document) < 0)
+                        {
+                            meNext = meEnumerator.MoveNext();
+                        }
+                        else
+                        {
+                            otherNext = otherEnumerator.MoveNext();
+                        }
                     }
                 }
-
-                return answer;
             }
+            return answer;
         }
 
         public static SortedSet<Index.Posting> Or(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
@@ -48,54 +50,56 @@ namespace InformationRetrieval.PostingListUtils
             {
                 return new SortedSet<Index.Posting>();
             }
-            else
+
+            var answer = new SortedSet<Index.Posting>();
+
+            using (var meEnumerator = me.GetEnumerator())
             {
-                var answer = new SortedSet<Index.Posting>();
-
-                var meEnumerator = me.GetEnumerator();
-                var otherEnumerator = other.GetEnumerator();
-
-                bool meNext = meEnumerator.MoveNext();
-                bool otherNext = otherEnumerator.MoveNext();
-
-                while (meNext == true && otherNext == true)
+                using (var otherEnumerator = other.GetEnumerator())
                 {
-                    if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
                     {
-                        answer.Add(meEnumerator.Current);
-                        meNext = meEnumerator.MoveNext();
-                        otherNext = otherEnumerator.MoveNext();
+                        if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+                        {
+                            answer.Add(meEnumerator.Current);
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document) < 0)
+                        {
+                            answer.Add(meEnumerator.Current);
+                            meNext = meEnumerator.MoveNext();
+                        }
+                        else
+                        {
+                            answer.Add(otherEnumerator.Current);
+                            otherNext = otherEnumerator.MoveNext();
+                        }
                     }
-                    else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document) < 0)
+
+                    if (meNext == true)
                     {
-                        answer.Add(meEnumerator.Current);
-                        meNext = meEnumerator.MoveNext();
+                        do
+                        {
+                            answer.Add(meEnumerator.Current);
+                        } while (meEnumerator.MoveNext());
                     }
-                    else
+
+                    if (otherNext == true)
                     {
-                        answer.Add(otherEnumerator.Current);
-                        otherNext = otherEnumerator.MoveNext();
+                        do
+                        {
+                            answer.Add(otherEnumerator.Current);
+                        } while (otherEnumerator.MoveNext());
                     }
                 }
-
-                if(meNext == true)
-                {
-                    do
-                    {
-                        answer.Add(meEnumerator.Current);
-                    } while (meEnumerator.MoveNext());
-                }
-
-                if (otherNext == true)
-                {
-                    do
-                    {
-                        answer.Add(otherEnumerator.Current);
-                    } while (otherEnumerator.MoveNext());
-                }
-
-                return answer;
             }
+
+            return answer;
         }
     }
 }

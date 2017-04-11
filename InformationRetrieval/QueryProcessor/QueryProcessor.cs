@@ -75,14 +75,24 @@ namespace InformationRetrieval.QueryProcessor
 
             }
 
-            if (upperPostings.Count == 1)
+            SortedSet<Posting> upperPostingSet = new SortedSet<Posting>();
+            var upperMergeIterator = upperPostings.GetEnumerator();
+            if (upperMergeIterator.MoveNext() == false)
             {
-                return upperPostings.FirstOrDefault();
+                /* No Elements merged */
             }
-            else
+
+            foreach (var element in upperMergeIterator.Current)
             {
-                return null;
+                upperPostingSet.Add(element);
             }
+
+            while (upperMergeIterator.MoveNext())
+            {
+                upperPostingSet = upperPostingSet.Or(upperMergeIterator.Current);
+            }
+
+            return upperPostingSet;
         }
     }
 }

@@ -93,6 +93,7 @@ namespace UnitTests.QueryProcessor
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
                 new Posting("A"),
+                new Posting("B")
             };
 
             documents.ShouldBeEquivalentTo(referenceDocuments);

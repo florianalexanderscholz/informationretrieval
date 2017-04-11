@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
 using InformationRetrieval.PostingListUtils;
@@ -72,14 +70,18 @@ namespace InformationRetrieval.QueryProcessor
                 }
 
                 upperPostings.Add(postingSet);
-
             }
 
+            return OrMerge(upperPostings);
+        }
+
+        private SortedSet<Posting> OrMerge(List<SortedSet<Posting>> upperPostings)
+        {
             SortedSet<Posting> upperPostingSet = new SortedSet<Posting>();
             var upperMergeIterator = upperPostings.GetEnumerator();
             if (upperMergeIterator.MoveNext() == false)
             {
-                /* No Elements merged */
+                return upperPostingSet;
             }
 
             foreach (var element in upperMergeIterator.Current)

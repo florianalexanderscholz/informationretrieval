@@ -27,6 +27,9 @@ namespace InformationRetrieval.Tokenizer
                 if (token.Length > 0)
                 {
                     var processedToken = token.ToLower();
+                    processedToken = processedToken.Replace("ö","oe");
+                    processedToken = processedToken.Replace("ä", "ae");
+                    processedToken = processedToken.Replace("ü", "ue");
                     tokenList.Add(new Token(processedToken));
                 }
             }

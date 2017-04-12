@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
@@ -12,7 +10,7 @@ namespace UnitTests.QueryProcessor
     public class QueryProcessor_EvaluateExpression
     {
         [Fact]
-        public void QueryProcessor_EvaluateExpression_Case01()
+        public void QueryProcessor_EvaluateExpression_AbstractTest()
         {
             var expressionParser = Substitute.For<IExpressionParser>();
             var indexStorage = Substitute.For<IIndex>();
@@ -26,7 +24,7 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
-        public void QueryProcessor_EvaluateExpression_Case02()
+        public void QueryProcessor_EvaluateExpression_AndConjunction()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
@@ -51,7 +49,7 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
-        public void QueryProcessor_EvaluateExpression_Case021()
+        public void QueryProcessor_EvaluateExpression_SingleSearch()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
@@ -75,7 +73,31 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
-        public void QueryProcessor_EvaluateExpression_Case022()
+        public void QueryProcessor_EvaluateExpression_AndNotWithoutOr()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+
+            var documents = queryProcessor.EvaluateExpression("|ein,!Troll|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("B"),
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_OrOr()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
@@ -100,7 +122,7 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
-        public void QueryProcessor_EvaluateExpression_Case03()
+        public void QueryProcessor_EvaluateExpression_SingleAndInOr()
         {
             var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
@@ -123,6 +145,55 @@ namespace UnitTests.QueryProcessor
             documents.ShouldBeEquivalentTo(referenceDocuments);
         }
 
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_AndOrAndNot()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+            var tokensDocC = tokenizer.GetTokensFromDocument("Es war einmal ein Fuchs");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            indexStorage.InsertPostings(tokensDocC, "C");
+            var documents = queryProcessor.EvaluateExpression("|Kater|es,!fuchs|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A"),
+                new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_Not()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Es war einmal ein kleiner Troll");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Es war einmal ein Kater");
+            var tokensDocC = tokenizer.GetTokensFromDocument("Es war einmal ein Fuchs");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            indexStorage.InsertPostings(tokensDocC, "C");
+            var documents = queryProcessor.EvaluateExpression("|!Fuchs|", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A"),
+                new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
 
         [Fact]
         public void QueryProcessor_EvaluateExpression_ExpressionEmpty()

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
 using InformationRetrieval.PostingListUtils;
@@ -32,7 +33,7 @@ namespace InformationRetrieval.QueryProcessor
 
             foreach (var conjunction in dnfTree.Conjunctions)
             {
-                Dictionary<string, SortedSet<Posting>> postingList = new Dictionary<string, SortedSet<Posting>>();
+                SortedList<int, PostingEntry> postingList = new SortedList<int, PostingEntry>(new DuplicateKeyComparer<int>());
 
                 foreach (var variable in conjunction.Variables)
                 {
@@ -47,7 +48,19 @@ namespace InformationRetrieval.QueryProcessor
                         }
                     }
 
-                    postingList.Add(variable.Value, postings);
+                    PostingEntry postingEntry = new PostingEntry()
+                    {
+                        Variable = variable,
+                        PostingSet = postings
+                    };
+
+                    int priority = postings.Count;
+
+                    if (variable.Negative)
+                    {
+                        priority = Int32.MaxValue;
+                    }
+                    postingList.Add(priority, postingEntry);
                 }
 
                 SortedSet<Posting> postingSet = new SortedSet<Posting>();
@@ -60,16 +73,33 @@ namespace InformationRetrieval.QueryProcessor
                         continue;
                     }
 
-                    foreach (var element in currentMergeIterator.Current.Value)
+                    var firstEntry = currentMergeIterator.Current.Value;
+                        foreach (var element in firstEntry.PostingSet)
+                        {
+                            postingSet.Add(element);
+                        }
+
+                    if (firstEntry.Variable.Negative)
                     {
-                        postingSet.Add(element);
+                        var allDocs = indexStorage.GetAllDocuments();
+                        postingSet = postingSet.Not(indexStorage);
                     }
 
                     while (currentMergeIterator.MoveNext())
                     {
-                        postingSet = postingSet.And(currentMergeIterator.Current.Value);
+                        var currentEntry = currentMergeIterator.Current.Value;
+
+                        if (currentEntry.Variable.Negative)
+                        {
+                            postingSet = postingSet.AndNot(currentEntry.PostingSet);
+                        }
+                        else
+                        {
+                            postingSet = postingSet.And(currentEntry.PostingSet);
+                        }
                     }
                 }
+
                 upperPostings.Add(postingSet);
             }
 

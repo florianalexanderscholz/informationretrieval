@@ -23,7 +23,7 @@ namespace UnitTests.Tokenizer
                 new Token("frau"),
                 new Token("hatte"),
                 new Token("zwei"),
-                new Token("töchter"),
+                new Token("toechter"),
             });
 
             tokenList.ShouldAllBeEquivalentTo(referenceTokenList);
@@ -34,7 +34,7 @@ namespace UnitTests.Tokenizer
         {
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
-            const string documentContent = "\"Baum\", sprach Jan, rüttel' dich.";
+            const string documentContent = "\"Baum\", sprach Jan, ruettel' dich.";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 
@@ -44,7 +44,7 @@ namespace UnitTests.Tokenizer
                 new Token("baum"),
                 new Token("sprach"),
                 new Token("jan"),
-                new Token("rüttel'"),
+                new Token("ruettel'"),
                 new Token("dich"),
             });
 
@@ -67,7 +67,7 @@ namespace UnitTests.Tokenizer
                 new Token("mordor"),
                 new Token("der"),
                 new Token("ring"),
-                new Token("gehört"),
+                new Token("gehoert"),
                 new Token("uns"),
             });
 

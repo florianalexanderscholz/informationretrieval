@@ -16,7 +16,7 @@ namespace InformationRetrieval.Index
         public int CompareTo(object obj)
         {
             Posting b = (Posting) obj;
-            return String.Compare(Document, b.Document, StringComparison.Ordinal);
+            return String.Compare(Document, b.Document, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

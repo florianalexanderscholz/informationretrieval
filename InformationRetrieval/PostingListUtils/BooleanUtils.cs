@@ -32,7 +32,7 @@ namespace InformationRetrieval.PostingListUtils
                             otherNext = otherEnumerator.MoveNext();
                         }
                         else if (string.Compare(meEnumerator.Current.Document,
-                                     otherEnumerator.Current.Document) < 0)
+                                     otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
                         {
                             meNext = meEnumerator.MoveNext();
                         }
@@ -71,7 +71,7 @@ namespace InformationRetrieval.PostingListUtils
                             otherNext = otherEnumerator.MoveNext();
                         }
                         else if (string.Compare(meEnumerator.Current.Document,
-                                     otherEnumerator.Current.Document) < 0)
+                                     otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
                         {
                             answer.Add(meEnumerator.Current);
                             meNext = meEnumerator.MoveNext();
@@ -115,7 +115,7 @@ namespace InformationRetrieval.PostingListUtils
 
                     while (meNext == true && otherNext == true)
                     {
-                        if (meEnumerator.Current.Document == otherEnumerator.Current.Document)
+                        if (string.CompareOrdinal(meEnumerator.Current.Document,otherEnumerator.Current.Document) == 0)
                         {
                             meNext = meEnumerator.MoveNext();
                             otherNext = otherEnumerator.MoveNext();
@@ -165,7 +165,7 @@ namespace InformationRetrieval.PostingListUtils
                             meNext = meEnumerator.MoveNext();
                             otherNext = otherEnumerator.MoveNext();
                         }
-                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document) < 0)
+                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
                         {
                             answer.Add(meEnumerator.Current);
                             meNext = meEnumerator.MoveNext();

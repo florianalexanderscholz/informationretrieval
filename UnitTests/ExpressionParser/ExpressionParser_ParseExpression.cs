@@ -112,6 +112,47 @@ namespace UnitTests.ExpressionParser
 
             dnfExpression.ShouldBeEquivalentTo(referenceBooleanExpression);
         }
+
+        [Fact]
+        public void ExpressionParser_ParseExpression_ProximityQuery()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+
+            var dnfExpression = expressionParser.ParseExpression("|Hexe,5Prinzessin|König,!Hexe||");
+
+            var referenceBooleanExpression = new DNFExpression()
+            {
+                Conjunctions = new List<Conjunction>()
+                {
+                    new Conjunction()
+                    {
+                        Variables = new List<Variable>()
+                        {
+                            new Variable("hexe"),
+                            new Variable("prinzessin")
+                            {
+                                PositionalRestriction = 5,
+                                Negative = false
+                            }
+                        }
+                    },
+                    new Conjunction()
+                    {
+                        Variables = new List<Variable>()
+                        {
+                            new Variable("könig"),
+                            new Variable("hexe")
+                            {
+                                Negative = true
+                            },
+                        }
+                    }
+                }
+            };
+
+            dnfExpression.ShouldBeEquivalentTo(referenceBooleanExpression);
+        }
+
         [Fact]
         public void ExpressionParser_ParseExpression_ParseOneVariable()
         {

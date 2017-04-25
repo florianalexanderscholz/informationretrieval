@@ -19,5 +19,7 @@
         /// Indicates if a variable is negative.
         /// </summary>
         public bool Negative { get; set; } = false;
+
+        public int PositionalRestriction { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace InformationRetrieval.ExpressionParser
+﻿using System;
+
+namespace InformationRetrieval.ExpressionParser
 {
     public class ExpressionParser : IExpressionParser
     {
@@ -39,15 +41,23 @@
 
                     /* Adding support for negative AND */
                     bool negative = false;
+                    int positionalRestrict = 0;
                     if (value[0] == PrefixNegative)
                     {
                         negative = true;
                         value = value.Substring(1);
                     }
+                    else if (Char.IsDigit(value[0]))
+                    {
+                        var digit = (int)char.GetNumericValue(value[0]);
+                        positionalRestrict = digit;
+                        value = value.Substring(1);
+                    }
 
                     Variable variableExpression = new Variable(value)
                     {
-                        Negative = negative
+                        Negative = negative,
+                        PositionalRestriction = positionalRestrict
                     };
 
                     andExpression.Variables.Add(variableExpression);

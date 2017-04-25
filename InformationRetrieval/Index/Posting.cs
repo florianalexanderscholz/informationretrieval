@@ -11,6 +11,8 @@ namespace InformationRetrieval.Index
             this.Document = document;
         }
 
+        public SortedSet<int> Positions { get; set; } = new SortedSet<int>();
+
         public string Document { get; set; }
 
         public int CompareTo(object obj)

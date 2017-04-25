@@ -19,11 +19,11 @@ namespace UnitTests.Tokenizer
             var referenceTokenList = new List<Token>();
             referenceTokenList.AddRange(new List<Token>
             {
-                new Token("die"),
-                new Token("frau"),
-                new Token("hatte"),
-                new Token("zwei"),
-                new Token("toechter"),
+                new Token("die", 0),
+                new Token("frau", 1),
+                new Token("hatte", 2),
+                new Token("zwei", 3),
+                new Token("toechter", 4),
             });
 
             tokenList.ShouldAllBeEquivalentTo(referenceTokenList);
@@ -41,11 +41,11 @@ namespace UnitTests.Tokenizer
             var referenceTokenList = new List<Token>();
             referenceTokenList.AddRange(new List<Token>
             {
-                new Token("baum"),
-                new Token("sprach"),
-                new Token("jan"),
-                new Token("ruettel'"),
-                new Token("dich"),
+                new Token("baum", 0),
+                new Token("sprach", 1),
+                new Token("jan", 2),
+                new Token("ruettel'", 3),
+                new Token("dich", 4),
             });
 
             tokenList.ShouldAllBeEquivalentTo(referenceTokenList);
@@ -64,11 +64,11 @@ namespace UnitTests.Tokenizer
             var referenceTokenList = new List<Token>();
             referenceTokenList.AddRange(new List<Token>
             {
-                new Token("mordor"),
-                new Token("der"),
-                new Token("ring"),
-                new Token("gehoert"),
-                new Token("uns"),
+                new Token("mordor", 0),
+                new Token("der", 1),
+                new Token("ring", 2),
+                new Token("gehoert", 3),
+                new Token("uns", 4),
             });
 
             tokenList.ShouldAllBeEquivalentTo(referenceTokenList);

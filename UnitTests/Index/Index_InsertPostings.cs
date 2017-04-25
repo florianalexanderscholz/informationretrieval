@@ -15,10 +15,10 @@ namespace UnitTests.Index
 
             List<Token> tokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba"),
-                new Token("die"),
-                new Token("und")
+                new Token("ali", 0),
+                new Token("baba", 1),
+                new Token("die", 2),
+                new Token("und", 3)
             };
 
             index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
@@ -30,28 +30,28 @@ namespace UnitTests.Index
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    new Posting("Ali Baba und die 40 Räuber.txt"){ Positions = {0}}
                 }
             });
             referenceDictionary.Add("baba", new Term()
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    new Posting("Ali Baba und die 40 Räuber.txt") { Positions = {1}}
                 }
             });
             referenceDictionary.Add("die", new Term()
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    new Posting("Ali Baba und die 40 Räuber.txt") {Positions = {2}}
                 }
             });
             referenceDictionary.Add("und", new Term()
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    new Posting("Ali Baba und die 40 Räuber.txt") {Positions = {3}}
                 }
             });
 
@@ -65,18 +65,18 @@ namespace UnitTests.Index
 
             List<Token> tokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba"),
-                new Token("die"),
-                new Token("und")
+                new Token("ali", 0),
+                new Token("baba", 1),
+                new Token("die", 2),
+                new Token("und", 3)
             };
 
             index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
 
             List<Token> otherTokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba")
+                new Token("ali", 0),
+                new Token("baba", 1)
             };
 
             index.InsertPostings(otherTokens, "Romeo und Julia.txt");
@@ -88,16 +88,28 @@ namespace UnitTests.Index
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt"),
+                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    {
+                        Positions = {0}
+                    },
                     new Posting("Romeo und Julia.txt")
+                    {
+                        Positions = {0}
+                    }
                 }
             });
             referenceDictionary.Add("baba", new Term()
             {
                 Postings = new SortedSet<Posting>()
                 {
-                    new Posting("Ali Baba und die 40 Räuber.txt"),
+                    new Posting("Ali Baba und die 40 Räuber.txt")
+                    {
+                        Positions = {1}
+                    },
                     new Posting("Romeo und Julia.txt")
+                    {
+                        Positions = {1}
+                    }
                 }
             });
             referenceDictionary.Add("die", new Term()
@@ -105,6 +117,9 @@ namespace UnitTests.Index
                 Postings = new SortedSet<Posting>()
                 {
                     new Posting("Ali Baba und die 40 Räuber.txt")
+                    {
+                        Positions = {2}
+                    }
                 }
             });
             referenceDictionary.Add("und", new Term()
@@ -112,6 +127,9 @@ namespace UnitTests.Index
                 Postings = new SortedSet<Posting>()
                 {
                     new Posting("Ali Baba und die 40 Räuber.txt")
+                    {
+                        Positions = {3}
+                    }
                 }
             });
 

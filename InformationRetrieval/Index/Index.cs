@@ -17,11 +17,26 @@ namespace InformationRetrieval.Index
 
             AllDocuments.Add(new Posting(filename));
 
+            Dictionary<string, SortedSet<int>> positionSet = new Dictionary<string,SortedSet<int>>();
+
             foreach (var token in tokens)
+            {
+                bool found_term = positionSet.TryGetValue(token.Value, out SortedSet<int> valueSet);
+                if (found_term)
+                {
+                    valueSet.Add(token.Position);
+                }
+                else
+                {
+                    positionSet[token.Value] = new SortedSet<int> {token.Position};
+                }
+            }
+            
+            foreach (var token in positionSet)
             {
                 bool found_term = false;
 
-                if (Terms.TryGetValue(token.Value, out Term term) == true)
+                if (Terms.TryGetValue(token.Key, out Term term) == true)
                 {
                     found_term = true;
                 }
@@ -30,13 +45,18 @@ namespace InformationRetrieval.Index
                     term = new Term();
                 }
 
-                term.Postings.Add(new Posting(filename));
+                term.Postings.Add(new Posting(filename)
+                {
+                    Positions = token.Value
+                });
 
                 if (found_term == false)
                 {
-                    Terms.Add(token.Value, term);
+                    Terms.Add(token.Key, term);
                 }
             }
+
+
         }
 
         public SortedSet<Posting> GetAllDocuments()

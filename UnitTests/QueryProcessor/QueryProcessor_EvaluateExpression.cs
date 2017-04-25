@@ -18,7 +18,7 @@ namespace UnitTests.QueryProcessor
 
             expressionParser.ParseExpression("|Hexe,König|").Returns(new DNFExpression());
 
-            queryProcessor.EvaluateExpression("|Hexe,König|", indexStorage);
+            queryProcessor.EvaluateBooleanExpression("|Hexe,König|", indexStorage);
 
             expressionParser.Received().ParseExpression("|Hexe,König|");
         }
@@ -37,7 +37,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
 
-            var documents = queryProcessor.EvaluateExpression("|einmal,ein|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|einmal,ein|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -62,7 +62,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
 
-            var documents = queryProcessor.EvaluateExpression("|Troll|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|Troll|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -86,7 +86,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
 
-            var documents = queryProcessor.EvaluateExpression("|ein,!Troll|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|ein,!Troll|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -110,7 +110,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
 
-            var documents = queryProcessor.EvaluateExpression("|Troll|Kater|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|Troll|Kater|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -135,7 +135,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
 
-            var documents = queryProcessor.EvaluateExpression("|einmal,troll|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|einmal,troll|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -159,7 +159,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
             indexStorage.InsertPostings(tokensDocC, "C");
-            var documents = queryProcessor.EvaluateExpression("|Kater|es,!fuchs|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|Kater|es,!fuchs|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -184,7 +184,7 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocA, "A");
             indexStorage.InsertPostings(tokensDocB, "B");
             indexStorage.InsertPostings(tokensDocC, "C");
-            var documents = queryProcessor.EvaluateExpression("|!Fuchs|", indexStorage);
+            var documents = queryProcessor.EvaluateBooleanExpression("|!Fuchs|", indexStorage);
 
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
@@ -202,7 +202,7 @@ namespace UnitTests.QueryProcessor
             var indexStorage = Substitute.For<IIndex>();
             var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
 
-            var sortingList = queryProcessor.EvaluateExpression(string.Empty, indexStorage);
+            var sortingList = queryProcessor.EvaluateBooleanExpression(string.Empty, indexStorage);
 
             sortingList.Should().BeEmpty();
         }
@@ -214,7 +214,7 @@ namespace UnitTests.QueryProcessor
             var indexStorage = Substitute.For<IIndex>();
             var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
 
-            var sortingList = queryProcessor.EvaluateExpression(null, indexStorage);
+            var sortingList = queryProcessor.EvaluateBooleanExpression(null, indexStorage);
 
             sortingList.Should().BeEmpty();
         }
@@ -226,7 +226,7 @@ namespace UnitTests.QueryProcessor
             Substitute.For<IIndex>();
             var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
 
-            var sortingList = queryProcessor.EvaluateExpression("König", null);
+            var sortingList = queryProcessor.EvaluateBooleanExpression("König", null);
 
             sortingList.Should().BeEmpty();
         }

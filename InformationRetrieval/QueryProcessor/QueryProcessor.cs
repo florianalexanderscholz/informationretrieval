@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
 using InformationRetrieval.PostingListUtils;
@@ -15,7 +16,7 @@ namespace InformationRetrieval.QueryProcessor
             this.expressionParser = expressionParser;
         }
 
-        public SortedSet<Posting> EvaluateExpression(string expression, IIndex indexStorage)
+        public SortedSet<Posting> EvaluateBooleanExpression(string expression, IIndex indexStorage)
         {
             if (string.IsNullOrEmpty(expression))
             {
@@ -103,7 +104,36 @@ namespace InformationRetrieval.QueryProcessor
                 upperPostings.Add(postingSet);
             }
 
-            return OrMerge(upperPostings);
+            var mergedPostings = OrMerge(upperPostings);
+
+            return removePositionsFromPostings(mergedPostings);
+        }
+
+        private SortedSet<Posting> removePositionsFromPostings(SortedSet<Posting> mergedPostings)
+        {
+            foreach (var mergedPosting in mergedPostings)
+            {
+                mergedPosting.Positions.Clear();
+            }
+
+            return mergedPostings;
+        }
+
+        public SortedSet<Posting> EvaluateFullPhraseQuery(string request, IIndex index)
+        {
+            var tokens = request.Split(new char[] {' '}).ToArray();
+            int degree = tokens.Count();
+            if (degree != 2)
+            {
+                return new SortedSet<Posting>();
+            }
+
+            var firstWord = tokens[0];
+            var secondWord = tokens[1];
+
+            var sortedSet = new SortedSet<Posting>();
+
+            return sortedSet;
         }
 
         private SortedSet<Posting> OrMerge(List<SortedSet<Posting>> upperPostings)

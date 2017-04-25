@@ -37,7 +37,8 @@ namespace InformationRetrieval
                 Console.Write("Abfrage: ");
                 string request = Console.ReadLine().Trim('\r', '\n').Trim();
 
-                var documents = queryProcessor.EvaluateExpression(request, index);
+                //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
+                var documents = queryProcessor.EvaluateBooleanExpression(request, index);
 
                 if (documents.Any() == false)
                 {

@@ -15,10 +15,10 @@ namespace UnitTests.Index
 
             List<Token> tokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba"),
-                new Token("die"),
-                new Token("und")
+                new Token("ali", 0),
+                new Token("baba", 1),
+                new Token("die", 2),
+                new Token("und", 3)
             };
 
             index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
@@ -34,10 +34,10 @@ namespace UnitTests.Index
 
             List<Token> tokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba"),
-                new Token("die"),
-                new Token("und")
+                new Token("ali", 0),
+                new Token("baba", 1),
+                new Token("die", 2),
+                new Token("und", 3)
             };
 
             index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
@@ -53,20 +53,26 @@ namespace UnitTests.Index
 
             List<Token> tokens = new List<Token>()
             {
-                new Token("ali"),
-                new Token("baba"),
-                new Token("die"),
-                new Token("und")
+                new Token("ali", 0),
+                new Token("baba", 1),
+                new Token("die", 2),
+                new Token("und", 3)
             };
 
             index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
 
             bool found = index.GetPosting("ali", out Term term);
             found.Should().BeTrue();
-
+        
             term.Postings.ShouldBeEquivalentTo(new SortedSet<Posting>()
             {
                 new Posting("Ali Baba und die 40 Räuber.txt")
+                {
+                    Positions = new SortedSet<int>()
+                    {
+                        0
+                    }
+                }
             });
         }
     }

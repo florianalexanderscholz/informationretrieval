@@ -21,6 +21,8 @@ namespace InformationRetrieval.Tokenizer
 
             var tokenSet = documentContent.Split(new char[] {'.', ',', ';', ':', '!', '?', '"', '-', ' ', '\n', '\r', '\t'});
 
+            int wordCounter = 0;
+
             List<Token> tokenList = new List<Token>();
             foreach (var token in tokenSet)
             {
@@ -30,7 +32,8 @@ namespace InformationRetrieval.Tokenizer
                     processedToken = processedToken.Replace("ö","oe");
                     processedToken = processedToken.Replace("ä", "ae");
                     processedToken = processedToken.Replace("ü", "ue");
-                    tokenList.Add(new Token(processedToken));
+                    tokenList.Add(new Token(processedToken, wordCounter));
+                    wordCounter++;
                 }
             }
 

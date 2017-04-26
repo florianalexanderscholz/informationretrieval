@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformationRetrieval.Index;
 
 namespace InformationRetrieval.PostingListUtils
@@ -8,7 +9,7 @@ namespace InformationRetrieval.PostingListUtils
     {
         public static SortedSet<Index.Posting> And(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
         {
-            if(me == null || other == null)
+            if (me == null || other == null)
             {
                 return new SortedSet<Index.Posting>();
             }
@@ -115,7 +116,7 @@ namespace InformationRetrieval.PostingListUtils
 
                     while (meNext == true && otherNext == true)
                     {
-                        if (string.CompareOrdinal(meEnumerator.Current.Document,otherEnumerator.Current.Document) == 0)
+                        if (string.CompareOrdinal(meEnumerator.Current.Document, otherEnumerator.Current.Document) == 0)
                         {
                             meNext = meEnumerator.MoveNext();
                             otherNext = otherEnumerator.MoveNext();
@@ -165,7 +166,8 @@ namespace InformationRetrieval.PostingListUtils
                             meNext = meEnumerator.MoveNext();
                             otherNext = otherEnumerator.MoveNext();
                         }
-                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
+                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document,
+                                     StringComparison.OrdinalIgnoreCase) < 0)
                         {
                             answer.Add(meEnumerator.Current);
                             meNext = meEnumerator.MoveNext();
@@ -197,5 +199,197 @@ namespace InformationRetrieval.PostingListUtils
 
             return answer;
         }
+
+        public static SortedSet<Index.Posting> ProximityAndSymmetric(this SortedSet<Index.Posting> me,
+            SortedSet<Index.Posting> other, int k)
+        {
+            if (me == null || other == null)
+            {
+                return new SortedSet<Index.Posting>();
+            }
+
+            var answer = new SortedSet<Index.Posting>();
+
+            using (var meEnumerator = me.GetEnumerator())
+            {
+                using (var otherEnumerator = other.GetEnumerator())
+                {
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
+                    {
+                        if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document,
+                                StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var l = new List<int>();
+                            var myPositions = meEnumerator.Current.Positions;
+                            var otherPositions = otherEnumerator.Current.Positions;
+
+                            using (var myPosEnumerator = myPositions.GetEnumerator())
+                            {
+                                using (var otherPosEnumerator = otherPositions.GetEnumerator())
+                                {
+                                    bool mePosNext = myPosEnumerator.MoveNext();
+                                    bool otherPosNext = otherPosEnumerator.MoveNext();
+
+                                    while (mePosNext == true)
+                                    {
+                                        while (otherPosNext == true)
+                                        {
+                                            if (Math.Abs(myPosEnumerator.Current - otherPosEnumerator.Current) <= k)
+                                            {
+                                                l.Add(otherPosEnumerator.Current);
+                                            }
+                                            else if (otherPosEnumerator.Current > myPosEnumerator.Current)
+                                            {
+                                                break;
+                                            }
+
+                                            otherPosNext = otherPosEnumerator.MoveNext();
+                                        }
+
+                                        while (l.Any() && Math.Abs(l.First() - myPosEnumerator.Current) > k)
+                                        {
+                                            l.RemoveAt(0);
+                                        }
+
+                                        foreach (var element in l)
+                                        {
+                                            answer.Add(new Posting(meEnumerator.Current.Document)
+                                            {
+                                                Positions = new SortedSet<int>()
+                                                {
+                                                    myPosEnumerator.Current,
+                                                    element
+                                                }
+                                            });
+                                        }
+
+                                        mePosNext = myPosEnumerator.MoveNext();
+                                        //l.RemoveWhere(m => (m - myPosEnumerator.Current) > k);
+                                    }
+
+                                }
+                            }
+
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+
+                        }
+                        else
+                        {
+                            if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document,
+                                    StringComparison.OrdinalIgnoreCase) < 0)
+                            {
+                                meNext = meEnumerator.MoveNext();
+                            }
+                            else
+                            {
+                                otherNext = otherEnumerator.MoveNext();
+                            }
+                        }
+                    }
+                }
+
+                return answer;
+            }
+        }
+
+        public static SortedSet<Index.Posting> ProximityAndAsymmetric(this SortedSet<Index.Posting> me,
+                SortedSet<Index.Posting> other, int k)
+            {
+                if (me == null || other == null)
+                {
+                    return new SortedSet<Index.Posting>();
+                }
+
+                var answer = new SortedSet<Index.Posting>();
+
+                using (var meEnumerator = me.GetEnumerator())
+                {
+                    using (var otherEnumerator = other.GetEnumerator())
+                    {
+
+                        bool meNext = meEnumerator.MoveNext();
+                        bool otherNext = otherEnumerator.MoveNext();
+
+                        while (meNext == true && otherNext == true)
+                        {
+                            if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) == 0)
+                            {
+                                var l = new List<int>();
+                                var myPositions = meEnumerator.Current.Positions;
+                                var otherPositions = otherEnumerator.Current.Positions;
+
+                                using (var myPosEnumerator = myPositions.GetEnumerator())
+                                {
+                                    using (var otherPosEnumerator = otherPositions.GetEnumerator())
+                                    {
+                                        bool mePosNext = myPosEnumerator.MoveNext();
+                                        bool otherPosNext = otherPosEnumerator.MoveNext();
+
+                                        while (mePosNext == true)
+                                        {
+                                            while (otherPosNext == true)
+                                            {
+                                                if (Math.Abs(myPosEnumerator.Current - otherPosEnumerator.Current) <= k && myPosEnumerator.Current < otherPosEnumerator.Current)
+                                                {
+                                                    l.Add(otherPosEnumerator.Current);
+                                                }
+                                                else if (otherPosEnumerator.Current > myPosEnumerator.Current)
+                                                {
+                                                    break;
+                                                }
+
+                                                otherPosNext = otherPosEnumerator.MoveNext();
+                                            }
+
+                                            while (l.Any() && Math.Abs(l.First() - myPosEnumerator.Current) > k)
+                                            {
+                                                l.RemoveAt(0);
+                                            }
+
+                                            foreach (var element in l)
+                                            {
+                                                answer.Add(new Posting(meEnumerator.Current.Document)
+                                                {
+                                                    Positions = new SortedSet<int>()
+                                                    {
+                                                        myPosEnumerator.Current,
+                                                        element
+                                                    }
+                                                });
+                                            }
+
+                                            mePosNext = myPosEnumerator.MoveNext();
+                                            //l.RemoveWhere(m => (m - myPosEnumerator.Current) > k);
+                                        }
+
+                                    }
+                                }
+
+                                meNext = meEnumerator.MoveNext();
+                                otherNext = otherEnumerator.MoveNext();
+
+                            }
+                            else
+                            {
+                                if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
+                                {
+                                    meNext = meEnumerator.MoveNext();
+                                }
+                                else
+                                {
+                                    otherNext = otherEnumerator.MoveNext();
+                                }
+                            }
+                        }
+                    }
+
+                    return answer;
+                }
+            }
     }
 }

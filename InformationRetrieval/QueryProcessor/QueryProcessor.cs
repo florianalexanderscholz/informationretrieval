@@ -57,7 +57,7 @@ namespace InformationRetrieval.QueryProcessor
 
                     int priority = postings.Count;
 
-                    if (variable.Negative)
+                    if (variable.Negative || variable.PositionalRestriction != 0)
                     {
                         priority = Int32.MaxValue;
                     }
@@ -82,7 +82,6 @@ namespace InformationRetrieval.QueryProcessor
 
                     if (firstEntry.Variable.Negative)
                     {
-                        var allDocs = indexStorage.GetAllDocuments();
                         postingSet = postingSet.Not(indexStorage);
                     }
 
@@ -94,9 +93,14 @@ namespace InformationRetrieval.QueryProcessor
                         {
                             postingSet = postingSet.AndNot(currentEntry.PostingSet);
                         }
-                        else
+                        else if(currentEntry.Variable.PositionalRestriction == 0)
                         {
                             postingSet = postingSet.And(currentEntry.PostingSet);
+                        }
+                        else
+                        {
+                            postingSet = postingSet.ProximityAndSymmetric(currentEntry.PostingSet,
+                                currentEntry.Variable.PositionalRestriction);
                         }
                     }
                 }
@@ -105,16 +109,6 @@ namespace InformationRetrieval.QueryProcessor
             }
 
             var mergedPostings = OrMerge(upperPostings);
-
-            return removePositionsFromPostings(mergedPostings);
-        }
-
-        private SortedSet<Posting> removePositionsFromPostings(SortedSet<Posting> mergedPostings)
-        {
-            foreach (var mergedPosting in mergedPostings)
-            {
-                mergedPosting.Positions.Clear();
-            }
 
             return mergedPostings;
         }

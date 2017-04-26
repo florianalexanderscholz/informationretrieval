@@ -45,7 +45,7 @@ namespace UnitTests.QueryProcessor
                 new Posting("B")
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace UnitTests.QueryProcessor
                 new Posting("A"),
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace UnitTests.QueryProcessor
                 new Posting("B"),
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -111,14 +111,14 @@ namespace UnitTests.QueryProcessor
             indexStorage.InsertPostings(tokensDocB, "B");
 
             var documents = queryProcessor.EvaluateBooleanExpression("|Troll|Kater|", indexStorage);
-
+            
             SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
             {
                 new Posting("A"),
                 new Posting("B")
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace UnitTests.QueryProcessor
                 new Posting("A"),
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace UnitTests.QueryProcessor
                 new Posting("B")
             };
 
-            documents.ShouldBeEquivalentTo(referenceDocuments);
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
         }
 
         [Fact]
@@ -190,6 +190,83 @@ namespace UnitTests.QueryProcessor
             {
                 new Posting("A"),
                 new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_Proximity()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Maria ging durch den Dornwald");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Maria ging im Dornwald durch den Dornwald");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            var documents = queryProcessor.EvaluateBooleanExpression("Maria,3Dornwald", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("B")
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments,
+                o => o.Excluding(info => info.SelectedMemberInfo.Name == "Positions"));
+        }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_Proximity2()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Maria ging durch den Dornwald");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Maria ging im Dornwald durch den Dornwald");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            var documents = queryProcessor.EvaluateBooleanExpression("Maria,7Dornwald", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A")
+                {
+                    Positions = {0,4}
+                },
+                new Posting("B")
+                {
+                    Positions = {0,3}
+                }
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments);
+        }
+
+        [Fact]
+        public void QueryProcessor_EvaluateExpression_Proximity3()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Maria ging durch den Dornwald");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Maria ging im Dornwald durch den Dornwald");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            var documents = queryProcessor.EvaluateBooleanExpression("Maria,3Dornwald", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("B")
+                {
+                    Positions = {0,3}
+                }
             };
 
             documents.ShouldBeEquivalentTo(referenceDocuments);

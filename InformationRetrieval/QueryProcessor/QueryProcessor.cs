@@ -9,7 +9,7 @@ namespace InformationRetrieval.QueryProcessor
 {
     public class QueryProcessor : IQueryProcessor
     {
-        private IExpressionParser expressionParser;
+        private readonly IExpressionParser expressionParser;
 
         public QueryProcessor(IExpressionParser expressionParser)
         {

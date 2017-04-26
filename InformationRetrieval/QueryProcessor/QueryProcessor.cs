@@ -9,7 +9,7 @@ namespace InformationRetrieval.QueryProcessor
 {
     public class QueryProcessor : IQueryProcessor
     {
-        private readonly IExpressionParser expressionParser;
+        private IExpressionParser expressionParser;
 
         public QueryProcessor(IExpressionParser expressionParser)
         {
@@ -117,17 +117,45 @@ namespace InformationRetrieval.QueryProcessor
         {
             var tokens = request.Split(new char[] {' '}).ToArray();
             int degree = tokens.Count();
-            if (degree != 2)
+
+            if (degree >= 1)
+            {
+                return performFullPhraseQuery(index, tokens);
+            }
+
+            return new SortedSet<Posting>();
+        }
+
+        private SortedSet<Posting> performFullPhraseQuery(IIndex index, string[] tokens)
+        {
+            var words = (from t in tokens select t.ToLower()).ToArray();
+
+            var sortedSet = new List<Term>();
+
+            bool allMatches = true;
+            for (int i = 0; i < words.Length; i++)
+            {
+                allMatches &= index.GetPosting(words[i], out Term exportedTerm);
+                sortedSet.Add(exportedTerm);
+            }
+
+            if (allMatches == false)
             {
                 return new SortedSet<Posting>();
             }
 
-            var firstWord = tokens[0];
-            var secondWord = tokens[1];
+            using (var enumerator = sortedSet.GetEnumerator())
+            {
+                enumerator.MoveNext();
 
-            var sortedSet = new SortedSet<Posting>();
+                var matchedPostings = enumerator.Current.Postings;
+                while (enumerator.MoveNext())
+                {
+                    matchedPostings = matchedPostings.ProximityAndAsymmetric(enumerator.Current.Postings, 1);
 
-            return sortedSet;
+                }
+                return matchedPostings;
+            }
         }
 
         private SortedSet<Posting> OrMerge(List<SortedSet<Posting>> upperPostings)

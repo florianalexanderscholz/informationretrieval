@@ -273,6 +273,31 @@ namespace UnitTests.QueryProcessor
         }
 
         [Fact]
+        public void QueryProcessor_EvaluateExpression_Fullphrase1()
+        {
+            var expressionParser = new InformationRetrieval.ExpressionParser.ExpressionParser();
+            var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
+            var indexStorage = new InformationRetrieval.Index.Index();
+            var queryProcessor = new InformationRetrieval.QueryProcessor.QueryProcessor(expressionParser);
+
+            var tokensDocA = tokenizer.GetTokensFromDocument("Maria ritt");
+            var tokensDocB = tokenizer.GetTokensFromDocument("Maria schwamm und ritt");
+            indexStorage.InsertPostings(tokensDocA, "A");
+            indexStorage.InsertPostings(tokensDocB, "B");
+            //var documents = queryProcessor.EvaluateBooleanExpression("Maria,3Dornwald", indexStorage);
+            var documents = queryProcessor.EvaluateFullPhraseQuery("Maria ritt", indexStorage);
+
+            SortedSet<Posting> referenceDocuments = new SortedSet<Posting>()
+            {
+                new Posting("A")
+                {
+                }
+            };
+
+            documents.ShouldBeEquivalentTo(referenceDocuments, o => o.Excluding(m => m.SelectedMemberInfo.Name == "Positions"));
+        }
+
+        [Fact]
         public void QueryProcessor_EvaluateExpression_ExpressionEmpty()
         {
             var expressionParser = Substitute.For<IExpressionParser>();

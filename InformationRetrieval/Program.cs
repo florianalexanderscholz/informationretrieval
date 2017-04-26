@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformationRetrieval.ExpressionParser;
@@ -32,13 +33,37 @@ namespace InformationRetrieval
                 index.InsertPostings(tokenizedFileContent, filepath);
             }
 
+            bool is_boolean = false;
             while (true)
             {
-                Console.Write("Abfrage: ");
-                string request = Console.ReadLine().Trim('\r', '\n').Trim();
+                SortedSet<Posting> documents = null;
+                if (is_boolean == true)
+                {
+                    Console.Write("Boolean: ");
+                    string request = Console.ReadLine().Trim('\r', '\n').Trim();
+                    if (request == "switch")
+                    {
+                        is_boolean = !is_boolean;
+                        continue;
+                    }
 
-                //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
-                var documents = queryProcessor.EvaluateBooleanExpression(request, index);
+                    //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
+                    documents = queryProcessor.EvaluateBooleanExpression(request, index);
+                }
+                else if (is_boolean == false)
+                {
+                    Console.Write("FullPhrase: ");
+                    string request = Console.ReadLine().Trim('\r', '\n').Trim();
+                    if (request == "switch")
+                    {
+                        is_boolean = !is_boolean;
+                        continue;
+                    }
+
+                    //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
+                    documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
+                }
+
 
                 if (documents.Any() == false)
                 {

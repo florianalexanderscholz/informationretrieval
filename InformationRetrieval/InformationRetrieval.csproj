@@ -7,8 +7,10 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <AssemblyName>cmd</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics.Core" Version="3.17.0" />
     <PackageReference Include="SimpleInjector" Version="4.0.0" />
   </ItemGroup>
 </Project>

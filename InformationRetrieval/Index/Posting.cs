@@ -20,5 +20,7 @@ namespace InformationRetrieval.Index
             Posting b = (Posting) obj;
             return String.Compare(Document, b.Document, StringComparison.OrdinalIgnoreCase);
         }
+
+        public double Score { get; set; } = 0.0;
     }
 }

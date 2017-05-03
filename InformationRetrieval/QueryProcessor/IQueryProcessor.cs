@@ -6,7 +6,7 @@ namespace InformationRetrieval.QueryProcessor
 {
     public interface IQueryProcessor
     {
-        SortedSet<Posting> EvaluateBooleanExpression(string expression, IIndex indexStorage);
-        SortedSet<Posting> EvaluateFullPhraseQuery(string request, IIndex index);
+        List<Posting> EvaluateBooleanExpression(string expression, IIndex indexStorage);
+        List<Posting> EvaluateFullPhraseQuery(string request, IIndex index);
     }
 }

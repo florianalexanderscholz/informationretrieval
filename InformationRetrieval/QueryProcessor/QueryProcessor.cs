@@ -16,16 +16,16 @@ namespace InformationRetrieval.QueryProcessor
             this.expressionParser = expressionParser;
         }
 
-        public SortedSet<Posting> EvaluateBooleanExpression(string expression, IIndex indexStorage)
+        public List<Posting> EvaluateBooleanExpression(string expression, IIndex indexStorage)
         {
             if (string.IsNullOrEmpty(expression))
             {
-                return new SortedSet<Posting>();
+                return new List<Posting>();
             }
 
             if (indexStorage == null)
             {
-                return new SortedSet<Posting>();
+                return new List<Posting>();
             }
 
             var dnfTree = expressionParser.ParseExpression(expression);
@@ -110,10 +110,10 @@ namespace InformationRetrieval.QueryProcessor
 
             var mergedPostings = OrMerge(upperPostings);
 
-            return mergedPostings;
+            return mergedPostings.ToList();
         }
 
-        public SortedSet<Posting> EvaluateFullPhraseQuery(string request, IIndex index)
+        public List<Posting> EvaluateFullPhraseQuery(string request, IIndex index)
         {
             var tokens = request.Split(new char[] {' '}).ToArray();
             int degree = tokens.Count();
@@ -123,10 +123,10 @@ namespace InformationRetrieval.QueryProcessor
                 return performFullPhraseQuery(index, tokens);
             }
 
-            return new SortedSet<Posting>();
+            return new List<Posting>();
         }
 
-        private SortedSet<Posting> performFullPhraseQuery(IIndex index, string[] tokens)
+        private List<Posting> performFullPhraseQuery(IIndex index, string[] tokens)
         {
             var words = (from t in tokens select t.ToLower()).ToArray();
 
@@ -141,7 +141,7 @@ namespace InformationRetrieval.QueryProcessor
 
             if (allMatches == false)
             {
-                return new SortedSet<Posting>();
+                return new List<Posting>();
             }
 
             using (var enumerator = sortedSet.GetEnumerator())
@@ -154,7 +154,7 @@ namespace InformationRetrieval.QueryProcessor
                     matchedPostings = matchedPostings.ProximityAndAsymmetric(enumerator.Current.Postings, 1);
 
                 }
-                return matchedPostings;
+                return matchedPostings.ToList();
             }
         }
 

@@ -33,15 +33,23 @@ namespace InformationRetrieval
                 index.InsertPostings(tokenizedFileContent, filepath);
             }
 
+            index.Finish();
+
             bool is_boolean = false;
             while (true)
             {
-                SortedSet<Posting> documents = null;
+                List<Posting> documents = null;
                 if (is_boolean == true)
                 {
                     Console.Write("Boolean: ");
                     string request = Console.ReadLine().Trim('\r', '\n').Trim();
-                    if (request == "switch")
+                    if (request == "makefuzzy")
+                    {
+                        Console.WriteLine("Switching to fuzzy mode!");
+                        queryProcessor = diContainer.GetInstance<FuzzyQueryProcessor>();
+                        continue;
+                    }
+                    else if (request == "switch")
                     {
                         is_boolean = !is_boolean;
                         continue;
@@ -60,11 +68,11 @@ namespace InformationRetrieval
                         continue;
                     }
 
-                    //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
                     documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
+                    //documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
                 }
 
-
+                
                 if (documents.Any() == false)
                 {
                     Console.WriteLine("Keine Treffer");
@@ -74,10 +82,11 @@ namespace InformationRetrieval
                     Console.WriteLine("Treffer: ");
                     foreach (var doc in documents)
                     {
-                        Console.WriteLine(doc.Document);
+                        Console.WriteLine("Doc: {0}, Score: {1}", doc.Document,doc.Score);
                     }
                     Console.WriteLine("---");
                 }
+                
             }
 
         }

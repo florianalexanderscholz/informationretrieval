@@ -47,6 +47,47 @@ namespace InformationRetrieval.PostingListUtils
             return answer;
         }
 
+        public static int AndCount(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
+        {
+            if (me == null || other == null)
+            {
+                return 0;
+            }
+
+            int answerCount = 0;;
+
+            using (var meEnumerator = me.GetEnumerator())
+            {
+                using (var otherEnumerator = other.GetEnumerator())
+                {
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
+                    {
+                        if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+                        {
+                            answerCount++;
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                        else if (string.Compare(meEnumerator.Current.Document,
+                                     otherEnumerator.Current.Document, StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            meNext = meEnumerator.MoveNext();
+                        }
+                        else
+                        {
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                    }
+                }
+            }
+
+            return answerCount;
+        }
+
         public static SortedSet<Index.Posting> AndNot(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
         {
             if (me == null || other == null)
@@ -198,6 +239,65 @@ namespace InformationRetrieval.PostingListUtils
             }
 
             return answer;
+        }
+
+        public static int OrCount(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
+        {
+            if (me == null || other == null)
+            {
+                return 0;
+            }
+
+            int answerCount = 0;
+
+            using (var meEnumerator = me.GetEnumerator())
+            {
+                using (var otherEnumerator = other.GetEnumerator())
+                {
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
+                    {
+                        if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+                        {
+                            answerCount++;
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                        else if (string.Compare(meEnumerator.Current.Document, otherEnumerator.Current.Document,
+                                     StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            answerCount++;
+                            meNext = meEnumerator.MoveNext();
+                        }
+                        else
+                        {
+                            answerCount++;
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                    }
+
+                    if (meNext == true)
+                    {
+                        do
+                        {
+                            answerCount++;
+                        } while (meEnumerator.MoveNext());
+                    }
+
+                    if (otherNext == true)
+                    {
+                        do
+                        {
+                            answerCount++;
+                        } while (otherEnumerator.MoveNext());
+                    }
+                }
+            }
+
+            return answerCount;
         }
 
         public static SortedSet<Index.Posting> ProximityAndSymmetric(this SortedSet<Index.Posting> me,

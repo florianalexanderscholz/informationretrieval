@@ -149,7 +149,7 @@ namespace InformationRetrieval.Index
                     {
                         var orCount = firstTerm.Postings.OrCount(secondTerm.Postings);
                         var jaccard = (double) andCount / orCount;
-                        if (jaccard > 0.59)
+                        if (jaccard > 0.49)
                         {
                             matrix[i, j] = jaccard;
                         }

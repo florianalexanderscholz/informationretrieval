@@ -10,5 +10,7 @@ namespace InformationRetrieval.Index
         void InsertPostings(List<Token> tokens, string filename);
         SortedSet<Posting> GetAllDocuments();
         bool GetPosting(string token, out Term term);
+        void Finish();
+        double GetFuzzyScore(string document, string term);
     }
 }

@@ -9,6 +9,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics.Core" Version="3.17.0" />
     <PackageReference Include="SimpleInjector" Version="4.0.0" />
   </ItemGroup>
 </Project>

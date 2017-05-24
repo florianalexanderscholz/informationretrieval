@@ -14,6 +14,10 @@ namespace InformationRetrieval
     {
         static void Main(string[] args)
         {
+            (int firstDigit, int secondDigit) a = (1, 2);
+            Console.WriteLine("{0}", a.firstDigit);
+            Console.WriteLine("{0}", a.secondDigit);
+            
             Container diContainer = new Container();
             diContainer.RegisterSingleton<IIndex, Index.Index>();
             diContainer.RegisterSingleton<IExpressionParser,ExpressionParser.ExpressionParser>();

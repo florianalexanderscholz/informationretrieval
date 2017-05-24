@@ -147,7 +147,10 @@ namespace InformationRetrieval.Index
                     }
                     else
                     {
-                        var orCount = firstTerm.Postings.OrCount(secondTerm.Postings);
+                        /* TODO: N + M - Intersect */
+
+                        var orCount = (firstTerm.Postings.Count + secondTerm.Postings.Count) - andCount;
+                        //var orCount = firstTerm.Postings.OrCount(secondTerm.Postings);
                         var jaccard = (double) andCount / orCount;
                         if (jaccard > 0.49)
                         {
@@ -177,6 +180,7 @@ namespace InformationRetrieval.Index
                             var t = i;
                             i = j;
                             j = t;
+                            
                         }
                         var matrix_value = matrix[i, j];
                             sum += Math.Log(1.0 - matrix[i, j]);

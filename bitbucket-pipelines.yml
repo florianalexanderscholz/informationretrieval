@@ -11,4 +11,4 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - dotnet restore
           - dotnet build InformationRetrieval
-#          - dotnet test TestName
+          - dotnet test UnitTests

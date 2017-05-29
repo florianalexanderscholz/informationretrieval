@@ -12,7 +12,7 @@ namespace UnitTests.Tokenizer
         {
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
-            const string documentContent = @"Die Frau hatte zwei Töchter.";
+            const string documentContent = @"Die Frau hatte zwei Toechter.";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 
@@ -57,7 +57,7 @@ namespace UnitTests.Tokenizer
             var tokenizer = new InformationRetrieval.Tokenizer.Tokenizer();
 
             const string documentContent = @"Mordor: 
-                    Der Ring gehört uns!";
+                    Der Ring gehoert uns!";
 
             var tokenList = tokenizer.GetTokensFromDocument(documentContent);
 

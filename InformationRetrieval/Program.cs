@@ -13,11 +13,7 @@ namespace InformationRetrieval
     public class Program
     {
         static void Main(string[] args)
-        {
-            (int firstDigit, int secondDigit) a = (1, 2);
-            Console.WriteLine("{0}", a.firstDigit);
-            Console.WriteLine("{0}", a.secondDigit);
-            
+        {            
             Container diContainer = new Container();
             diContainer.RegisterSingleton<IIndex, Index.Index>();
             diContainer.RegisterSingleton<IExpressionParser,ExpressionParser.ExpressionParser>();
@@ -30,69 +26,22 @@ namespace InformationRetrieval
             IQueryProcessor queryProcessor = diContainer.GetInstance<IQueryProcessor>();
             var directory = Directory.EnumerateFiles("../Documents/Corpus");
 
+            int docId = 0;
             foreach (var filepath in directory)
             {
                 var fileContent = File.ReadAllText(filepath);
                 var tokenizedFileContent = tokenizer.GetTokensFromDocument(fileContent);
-                index.InsertPostings(tokenizedFileContent, filepath);
+                index.InsertPostings(tokenizedFileContent, filepath, docId++);
             }
 
             index.Finish();
 
-            bool is_boolean = false;
             while (true)
             {
-                List<Posting> documents = null;
-                if (is_boolean == true)
-                {
-                    Console.Write("Boolean: ");
-                    string request = Console.ReadLine().Trim('\r', '\n').Trim();
-                    if (request == "makefuzzy")
-                    {
-                        Console.WriteLine("Switching to fuzzy mode!");
-                        queryProcessor = diContainer.GetInstance<FuzzyQueryProcessor>();
-                        continue;
-                    }
-                    else if (request == "switch")
-                    {
-                        is_boolean = !is_boolean;
-                        continue;
-                    }
-
-                    //var documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
-                    documents = queryProcessor.EvaluateBooleanExpression(request, index);
-                }
-                else if (is_boolean == false)
-                {
-                    Console.Write("FullPhrase: ");
-                    string request = Console.ReadLine().Trim('\r', '\n').Trim();
-                    if (request == "switch")
-                    {
-                        is_boolean = !is_boolean;
-                        continue;
-                    }
-
-                    documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
-                    //documents = queryProcessor.EvaluateFullPhraseQuery(request, index);
-                }
-
-                
-                if (documents.Any() == false)
-                {
-                    Console.WriteLine("Keine Treffer");
-                }
-                else
-                {
-                    Console.WriteLine("Treffer: ");
-                    foreach (var doc in documents)
-                    {
-                        Console.WriteLine("Doc: {0}, Score: {1}", doc.Document,doc.Score);
-                    }
-                    Console.WriteLine("---");
-                }
-                
+                Console.Write("Query: ");
+                string readline = Console.ReadLine();
+                index.PerformSearch(readline);
             }
-
         }
     }
 }

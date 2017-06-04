@@ -1,29 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using System.Linq;
+using System.Linq.Expressions;
 using InformationRetrieval.PostingListUtils;
 using InformationRetrieval.Tokenizer;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using Vector = MathNet.Numerics.LinearAlgebra.Single.Vector;
 
 namespace InformationRetrieval.Index
 {
+    public class ReverseComparer: IComparer<double>
+    {
+        public int Compare(double x, double y)
+        {
+            // Compare y and x in reverse order.
+            return y.CompareTo(x);
+        }
+    }
+    
     public class Index : IIndex
     {
         public SortedList<string, Term> Terms { get;  } = new SortedList<string, Term>();
         public SortedList<string, Document> AllDocuments { get; set; } = new SortedList<string, Document>();
         public Dictionary<int, Term> lookupTable = new Dictionary<int, Term>();
-        public void InsertPostings(List<Token> tokens, string filename)
+        SparseMatrix weight;
+        public void InsertPostings(List<Token> tokens, string filename, int docId)
         {
             if (tokens == null || string.IsNullOrEmpty(filename))
             {
                 return;
             }
 
-            AllDocuments.Add(filename, new Document()
+            AllDocuments.Add(filename, new Document(docId)
             {
                 Filename = filename,
+                Length = tokens.Count
                 
             });
 
@@ -55,7 +69,7 @@ namespace InformationRetrieval.Index
                     term = new Term();
                 }
 
-                term.Postings.Add(new Posting(filename)
+                term.Postings.Add(new Posting(filename, docId)
                 {
                     Positions = token.Value
                 });
@@ -97,107 +111,38 @@ namespace InformationRetrieval.Index
             return true;
         }
 
-        public double GetFuzzyScore(string document, string term)
+        public void PerformSearch(string query)
         {
-            bool foundDoc = AllDocuments.TryGetValue(document, out Document docDto);
-            if (foundDoc == false)
-            {
-                return 0.0;
-            }
-
-            bool foundTerm = GetPosting(term, out Term termDto);
-            if (foundTerm == false)
-            {
-                return 0.0;
-            }
-
-            bool foundCorrelation = docDto.Correlation.TryGetValue(termDto.Index, out double score);
-            if (foundCorrelation == false)
-            {
-                return 0.0;
-            }
-            else
-            {
-                return score;
-            }
-        }
-
-        private void CalculateJaccard()
-        {
-            Stopwatch sw = new Stopwatch();
-
-
-            sw.Start();
-            var termCount = lookupTable.Count;
-            SparseMatrix matrix = new SparseMatrix(termCount,termCount);
-
-            for (int i = 0; i < termCount; i++)
-            {
-                for (int j = 0; j <= i; j++)
-                {
-                    
-                    var firstTerm = lookupTable[i];
-                    var secondTerm = lookupTable[j];
-
-                    var andCount = firstTerm.Postings.AndCount(secondTerm.Postings);
-
-                    if (andCount == 0)
-                    {
-                        
-                    }
-                    else
-                    {
-                        /* TODO: N + M - Intersect */
-
-                        var orCount = (firstTerm.Postings.Count + secondTerm.Postings.Count) - andCount;
-                        //var orCount = firstTerm.Postings.OrCount(secondTerm.Postings);
-                        var jaccard = (double) andCount / orCount;
-                        if (jaccard > 0.49)
-                        {
-                            matrix[i, j] = jaccard;
-                        }
-                    }
-                }
-                
-            }
-            sw.Stop();
-
-            Console.WriteLine("Jaccard duration: {0}", sw.Elapsed.TotalSeconds);
-
-            sw.Restart();
+            List<string> words = query.ToLower().Split(' ').ToList();
+            double[] score = new double[AllDocuments.Count];
+            string[] docs = new string[AllDocuments.Count];
             foreach (var document in AllDocuments)
             {
-                
-                foreach (var posting in lookupTable)
+                docs[document.Value.DocId] = document.Value.Filename;
+                score[document.Value.DocId] = 0.0;
+                foreach (var term in words)
                 {
-                    double sum = 0.0;
-                    foreach (var term in document.Value.Terms)
+                    bool found = GetPosting(term, out Term foundTerm);
+                    if (found == false)
                     {
-                        var i = posting.Value.Index;
-                        var j = term.Index;
-                        if (i < j)
-                        {
-                            var t = i;
-                            i = j;
-                            j = t;
-                            
-                        }
-                        var matrix_value = matrix[i, j];
-                            sum += Math.Log(1.0 - matrix[i, j]);
+                        Console.WriteLine("Term not found: {0}", term);
+                        continue;
                     }
-                    sum = 1.0 - Math.Exp(sum);
-                    var v = sum.ToString();
-                    //Console.WriteLine(v);
-                    if (sum < 1.1)
-                    {
-                        document.Value.Correlation.Add(posting.Value.Index, sum);
-                    }
+                    score[document.Value.DocId] += weight[foundTerm.Index, document.Value.DocId];
                 }
+                score[document.Value.DocId] /= document.Value.Length;
             }
-            sw.Stop();
-            Console.WriteLine("Owaha duration: {0}", sw.Elapsed.TotalSeconds);
 
-        }
+            Array.Sort(score, docs, new ReverseComparer());
+
+            for (int i = 0; i < 5 && score[i] > 0.0001; i++)
+            {
+                Console.WriteLine("{0} ({1})", docs[i], score[i]);
+            }
+
+    }
+
+
         public void Finish()
         {
             int counter = 0;
@@ -211,11 +156,51 @@ namespace InformationRetrieval.Index
                 {
                     AllDocuments[posting.Document].Terms.Add(termPair.Value);
                 }
-                
             }
-            sw.Stop();
-            Console.WriteLine("Lookup tables duration: {0}", sw.Elapsed.TotalSeconds);
-            this.CalculateJaccard();
+
+            weight = new SparseMatrix(Terms.Count, AllDocuments.Count);
+            SparseMatrix termFrequency = new SparseMatrix(Terms.Count, AllDocuments.Count);
+            for (int i = 0; i < Terms.Count; i++)
+            {
+                for (int j = 0; j < AllDocuments.Count; j++)
+                {
+                    termFrequency[i,j] = 0;
+                }
+            }
+
+            foreach (var term in Terms.Values)
+            {
+                var termId = term.Index;
+                foreach (var posting in term.Postings)
+                {
+                    var docId = posting.DocId;
+                    termFrequency[termId, docId] = posting.Positions.Count;
+                }
+            }
+
+            var docFrequency = new DenseVector(Terms.Count);
+            
+
+            foreach (var term in Terms.Values)
+            {
+                docFrequency[term.Index] = term.Postings.Count;
+            }
+            for (int i = 0; i < Terms.Count; i++)
+            {
+                for (int j = 0; j < AllDocuments.Count; j++)
+                {
+                    if (termFrequency[i, j] > 0)
+                    {
+                        weight[i, j] = (1 + Math.Log10(termFrequency[i, j])) *
+                                        Math.Log(AllDocuments.Count / docFrequency[i]);
+                    }
+                    else
+                    {
+                        weight[i, j] = 0;
+                    }
+                }
+            }
+            Console.WriteLine("Done");
         }
     }
 }

@@ -6,11 +6,19 @@ namespace InformationRetrieval.Index
 {
     public class Posting : IComparable
     {
+        public Posting(string document, int docId)
+        {
+            this.Document = document;
+            this.DocId = docId;
+        }
+
         public Posting(string document)
         {
             this.Document = document;
         }
 
+        public int DocId { get; set; }
+        
         public SortedSet<int> Positions { get; set; } = new SortedSet<int>();
 
         public string Document { get; set; }

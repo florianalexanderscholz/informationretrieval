@@ -21,7 +21,7 @@ namespace UnitTests.Index
                 new Token("und", 3)
             };
 
-            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
+            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt", 0);
 
             bool found = index.GetPosting("sesam", out Term term);
             found.Should().BeFalse();
@@ -40,7 +40,7 @@ namespace UnitTests.Index
                 new Token("und", 3)
             };
 
-            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
+            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt", 0);
 
             bool found = index.GetPosting(string.Empty, out Term term);
             found.Should().BeFalse();
@@ -59,7 +59,7 @@ namespace UnitTests.Index
                 new Token("und", 3)
             };
 
-            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt");
+            index.InsertPostings(tokens, "Ali Baba und die 40 Räuber.txt", 0);
 
             bool found = index.GetPosting("ali", out Term term);
             found.Should().BeTrue();

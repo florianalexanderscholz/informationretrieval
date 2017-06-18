@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Tracing;
 using System.Linq;
-using System.Linq.Expressions;
-using InformationRetrieval.PostingListUtils;
 using InformationRetrieval.Tokenizer;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using Vector = MathNet.Numerics.LinearAlgebra.Single.Vector;
 
 namespace InformationRetrieval.Index
 {
@@ -23,10 +17,10 @@ namespace InformationRetrieval.Index
     
     public class Index : IIndex
     {
-        public SortedList<string, Term> Terms { get;  } = new SortedList<string, Term>();
-        public SortedList<string, Document> AllDocuments { get; set; } = new SortedList<string, Document>();
+        public Dictionary<string, Term> Terms { get;  } = new Dictionary<string, Term>();
+        public Dictionary<string, Document> AllDocuments { get; set; } = new Dictionary<string, Document>();
         public Dictionary<int, Term> lookupTable = new Dictionary<int, Term>();
-        SparseMatrix weight;
+        public List<Cluster> Clusters = new List<Cluster>();
         public void InsertPostings(List<Token> tokens, string filename, int docId)
         {
             if (tokens == null || string.IsNullOrEmpty(filename))
@@ -40,27 +34,13 @@ namespace InformationRetrieval.Index
                 Length = tokens.Count
                 
             });
-
-            Dictionary<string, SortedSet<int>> positionSet = new Dictionary<string,SortedSet<int>>();
-
+            int i = 0;
             foreach (var token in tokens)
             {
-                bool found_term = positionSet.TryGetValue(token.Value, out SortedSet<int> valueSet);
-                if (found_term)
-                {
-                    valueSet.Add(token.Position);
-                }
-                else
-                {
-                    positionSet[token.Value] = new SortedSet<int> {token.Position};
-                }
-            }
-            
-            foreach (var token in positionSet)
-            {
+                
                 bool found_term = false;
 
-                if (Terms.TryGetValue(token.Key, out Term term) == true)
+                if (Terms.TryGetValue(token.Value, out Term term) == true)
                 {
                     found_term = true;
                 }
@@ -69,14 +49,24 @@ namespace InformationRetrieval.Index
                     term = new Term();
                 }
 
-                term.Postings.Add(new Posting(filename, docId)
+                if (term.Postings.ContainsKey(docId) == false)
                 {
-                    Positions = token.Value
-                });
+                    term.Postings.Add(docId, new Posting(filename, docId)
+                    {
+                        Positions = new SortedSet<int>()
+                        {
+                            i
+                        }
+                    });
+                }
+                else
+                {
+                    term.Postings[docId].Positions.Add(i);
+                }
 
                 if (found_term == false)
                 {
-                    Terms.Add(token.Key, term);
+                    Terms.Add(token.Value, term);
                 }
             }
 
@@ -128,7 +118,14 @@ namespace InformationRetrieval.Index
                         Console.WriteLine("Term not found: {0}", term);
                         continue;
                     }
-                    score[document.Value.DocId] += weight[foundTerm.Index, document.Value.DocId];
+                    if (foundTerm.Postings.TryGetValue(document.Value.DocId, out Posting posting))
+                    {
+                        score[document.Value.DocId] += posting.Weight;
+                    }
+                    else
+                    {
+                        score[document.Value.DocId] += 0;
+                    }
                 }
                 score[document.Value.DocId] /= document.Value.Length;
             }
@@ -154,53 +151,79 @@ namespace InformationRetrieval.Index
                 lookupTable.Add(counter++, termPair.Value);
                 foreach (var posting in termPair.Value.Postings)
                 {
-                    AllDocuments[posting.Document].Terms.Add(termPair.Value);
+                    AllDocuments[posting.Value.Document].Terms.Add(termPair.Value);
+                    posting.Value.TermFrequency = posting.Value.Positions.Count;
                 }
+
+                termPair.Value.DocumentFrequency = termPair.Value.Postings.Count;
             }
 
-            weight = new SparseMatrix(Terms.Count, AllDocuments.Count);
-            SparseMatrix termFrequency = new SparseMatrix(Terms.Count, AllDocuments.Count);
-            for (int i = 0; i < Terms.Count; i++)
+            foreach (var doc in AllDocuments)
             {
-                for (int j = 0; j < AllDocuments.Count; j++)
+                /*
+                var currentDoc = doc.Value;
+
+                var length = 0.0;
+
+                foreach (var term in currentDoc.Terms)
                 {
-                    termFrequency[i,j] = 0;
+                    length += Math.Pow(term.Postings[doc.Value.DocId].TermFrequency, 2.0);
                 }
+
+                doc.Value.Length = Math.Sqrt(length);
+                */
             }
 
-            foreach (var term in Terms.Values)
+            foreach (var termPair in Terms)
             {
-                var termId = term.Index;
-                foreach (var posting in term.Postings)
+                foreach (var posting in termPair.Value.Postings)
                 {
-                    var docId = posting.DocId;
-                    termFrequency[termId, docId] = posting.Positions.Count;
-                }
-            }
-
-            var docFrequency = new DenseVector(Terms.Count);
-            
-
-            foreach (var term in Terms.Values)
-            {
-                docFrequency[term.Index] = term.Postings.Count;
-            }
-            for (int i = 0; i < Terms.Count; i++)
-            {
-                for (int j = 0; j < AllDocuments.Count; j++)
-                {
-                    if (termFrequency[i, j] > 0)
+                    if (posting.Value.TermFrequency > 0)
                     {
-                        weight[i, j] = (1 + Math.Log10(termFrequency[i, j])) *
-                                        Math.Log(AllDocuments.Count / docFrequency[i]);
+                        var value = (1 + Math.Log10(posting.Value.TermFrequency)) *
+                                    Math.Log(AllDocuments.Count / (double) termPair.Value.DocumentFrequency);
+                        posting.Value.Weight = value;
                     }
                     else
                     {
-                        weight[i, j] = 0;
+                        posting.Value.Weight = 0;
                     }
                 }
+
             }
-            Console.WriteLine("Done");
+
+            var nCluster = Math.Sqrt(AllDocuments.Count);
+            var allDocs = AllDocuments.Values.ToArray();
+            Random shuffler = new Random();
+            shuffler.Shuffle(allDocs);
+
+            for (int i = 0; i < nCluster; i++)
+            {
+                Clusters.Add(new Cluster(allDocs[i]));
+            }
+
+            foreach (var doc in AllDocuments)
+            {
+                Cluster minCluster = null;
+                double score = 0;
+
+                minCluster = Clusters.First();
+                foreach (var cluster in Clusters)
+                {
+                    double sim = cluster.GetSimiliarity(doc.Value);
+                    if (sim > score)
+                    {
+                        score = sim;
+                        minCluster = cluster;
+                    }
+                }
+
+                minCluster.Followers.Add(doc.Value);
+                //Console.WriteLine("Add {0} to cluster {1}, scored: {2}", doc.Value.Filename, minCluster.Leader.Filename, score);
+            }
+
+            sw.Stop();
+            Console.WriteLine("Done: {0}s", sw.Elapsed.TotalSeconds);
         }
     }
 }

@@ -23,6 +23,10 @@ namespace InformationRetrieval.Index
 
         public string Document { get; set; }
 
+        public int TermFrequency { get; set; }
+
+        public double Weight { get; set; }
+
         public int CompareTo(object obj)
         {
             Posting b = (Posting) obj;

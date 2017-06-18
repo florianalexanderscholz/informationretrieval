@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using InformationRetrieval.ExpressionParser;
 using InformationRetrieval.Index;
 using InformationRetrieval.QueryProcessor;
 using InformationRetrieval.Tokenizer;
@@ -16,7 +14,6 @@ namespace InformationRetrieval
         {            
             Container diContainer = new Container();
             diContainer.RegisterSingleton<IIndex, Index.Index>();
-            diContainer.RegisterSingleton<IExpressionParser,ExpressionParser.ExpressionParser>();
             diContainer.RegisterSingleton<ITokenizer, Tokenizer.Tokenizer>();
             diContainer.RegisterSingleton<IQueryProcessor, QueryProcessor.QueryProcessor>();
             diContainer.Verify();
@@ -24,8 +21,10 @@ namespace InformationRetrieval
             IIndex index = diContainer.GetInstance<IIndex>();
             ITokenizer tokenizer = diContainer.GetInstance<ITokenizer>();
             IQueryProcessor queryProcessor = diContainer.GetInstance<IQueryProcessor>();
-            var directory = Directory.EnumerateFiles("../Documents/Corpus");
+            var directory = Directory.EnumerateFiles(@"C:\mantxt");
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             int docId = 0;
             foreach (var filepath in directory)
             {
@@ -33,12 +32,13 @@ namespace InformationRetrieval
                 var tokenizedFileContent = tokenizer.GetTokensFromDocument(fileContent);
                 index.InsertPostings(tokenizedFileContent, filepath, docId++);
             }
-
+            sw.Stop();
+            Console.WriteLine("Tokenization: {0}", sw.Elapsed.TotalSeconds);
             index.Finish();
 
             while (true)
             {
-                Console.Write("Query: ");
+                Console.Write("Querya: ");
                 string readline = Console.ReadLine();
                 index.PerformSearch(readline);
             }

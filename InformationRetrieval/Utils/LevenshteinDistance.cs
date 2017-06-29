@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InformationRetrieval.PostingListUtils
+namespace InformationRetrieval.Utils
 {
     /// <summary>
     /// Contains approximate string matching

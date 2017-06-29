@@ -10,8 +10,6 @@ namespace InformationRetrieval.Index
     public interface IIndex
     {
         void InsertPostings(List<Token> tokens, string filename, int docId);
-        SortedSet<Posting> GetAllDocuments();
-        bool GetPosting(string token, out Term term);
         List<Hit> PerformSearch(string query, IQueryFlags queryFlags, int r);
         void Finish();
     }

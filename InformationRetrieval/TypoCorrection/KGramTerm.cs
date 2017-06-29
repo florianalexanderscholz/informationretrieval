@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using InformationRetrieval.Index;
 
-namespace InformationRetrieval.Index
+namespace InformationRetrieval.TypoCorrection
 {
     public class KGramTerm
     {

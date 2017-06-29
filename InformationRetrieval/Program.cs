@@ -16,14 +16,12 @@ namespace InformationRetrieval
             Container diContainer = new Container();
             initializeDi(diContainer);
 
-            IIndex index = diContainer.GetInstance<IIndex>();
-            ITokenizer tokenizer = diContainer.GetInstance<ITokenizer>();
-            IQueryProcessor queryProcessor = diContainer.GetInstance<IQueryProcessor>();
-            readDocumentsToIndex(tokenizer, index);
+            string corpusPath = @"C:\Users\Florian\Documents\inrpraktikum\Documents\Corpus";
+            VectorSearchEngine vectorSearchEngine = new VectorSearchEngine(diContainer, corpusPath);
 
             while (true)
             {
-                Console.Write("Querya: ");
+                Console.Write("Query: ");
                 string readline = Console.ReadLine();
  
                 string query;
@@ -48,7 +46,7 @@ namespace InformationRetrieval
                     query = readline.Substring(0);
                 }
 
-                List<Hit> hitList = index.PerformSearch(query, queryFlags, 1);
+                List<Hit> hitList = vectorSearchEngine.SearchDocuments(query, queryFlags);
 
                 foreach (var hit in hitList)
                 {
@@ -63,24 +61,6 @@ namespace InformationRetrieval
             diContainer.RegisterSingleton<ITokenizer, Tokenizer.Tokenizer>();
             diContainer.RegisterSingleton<IQueryProcessor, QueryProcessor.QueryProcessor>();
             diContainer.Verify();
-        }
-
-        private static void readDocumentsToIndex(ITokenizer tokenizer, IIndex index)
-        {
-            var directory = Directory.EnumerateFiles(@"C:\mantxt");
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            int docId = 0;
-            foreach (var filepath in directory)
-            {
-                var fileContent = File.ReadAllText(filepath);
-                var tokenizedFileContent = tokenizer.GetTokensFromDocument(fileContent);
-                index.InsertPostings(tokenizedFileContent, filepath, docId++);
-            }
-            sw.Stop();
-            Console.WriteLine("Tokenization: {0}", sw.Elapsed.TotalSeconds);
-            index.Finish();
         }
     }
 }

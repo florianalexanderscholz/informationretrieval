@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformationRetrieval.Index;
-using InformationRetrieval.PostingListUtils;
+using InformationRetrieval.Utils;
 
 namespace InformationRetrieval.QueryProcessor
 {

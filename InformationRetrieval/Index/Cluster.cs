@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using InformationRetrieval.Utils;
 using MathNet.Numerics.LinearRegression;
 
 namespace InformationRetrieval.Index
@@ -18,7 +19,7 @@ namespace InformationRetrieval.Index
 
         public double GetSimiliarity(Document otherDoc)
         {
-            var set = Leader.Terms.Intersect(otherDoc.Terms);
+            var set = Leader.Terms.And(otherDoc.Terms);
             double score = 0.0;
             //Console.WriteLine("{0}", set.Count());
             foreach (var term in set)

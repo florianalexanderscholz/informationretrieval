@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using InformationRetrieval.QueryProcessor;
 using InformationRetrieval.Tokenizer;
 
 namespace InformationRetrieval.Index
@@ -8,9 +9,9 @@ namespace InformationRetrieval.Index
     {
         public string Filename { get; set; } = "";
         public double Length { get; set; }
-        public List<Term> Terms { get; set; } = new List<Term>();
-        public Dictionary<int, double> Correlation { get; set; } = new Dictionary<int, double>();
-        public int[] DocVec;
+        public SortedSet<Term> Terms { get; set; } = new SortedSet<Term>(new DuplicateKeyComparer<Term>());
+        //public Dictionary<int, double> Correlation { get; set; } = new Dictionary<int, double>();
+        //public int[] DocVec;
         public int DocId { get; set; }
         public Document(int docId)
         {

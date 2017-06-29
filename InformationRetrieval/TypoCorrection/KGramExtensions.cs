@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using InformationRetrieval.QueryProcessor;
 
-namespace InformationRetrieval.PostingListUtils
+namespace InformationRetrieval.TypoCorrection
 {
-    public static class KGramUtils
+    public static class KGramExtensions
     {
         public static SortedSet<string> KGrams(this string word, int k)
         {

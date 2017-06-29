@@ -15,7 +15,7 @@ namespace InformationRetrieval.Index
         {
             Term other = (Term) obj;
 
-            return Name.CompareTo(other.Name);
+            return string.Compare(Name, other.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

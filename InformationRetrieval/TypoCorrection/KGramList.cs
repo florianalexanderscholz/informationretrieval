@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
-using InformationRetrieval.PostingListUtils;
+using InformationRetrieval.Index;
+using InformationRetrieval.Utils;
 
-namespace InformationRetrieval.Index
+namespace InformationRetrieval.TypoCorrection
 {
     public class KGramList
     {
         public Dictionary<string, KGramTerm> kgramDictionary = new Dictionary<string, KGramTerm>();
 
-        public void Add(Term iTerm,string token, int k=3)
+        public void AddTermToTypoCorrection(Term iTerm, int k)
         {
-            var kgrams = token.KGrams(k);
+            var kgrams = iTerm.Name.KGrams(k);
 
             iTerm.KgramSet = kgrams;
             foreach (var kgram in kgrams)
@@ -33,9 +31,9 @@ namespace InformationRetrieval.Index
                     };
                 }
 
-                if (term.Words.Keys.Contains(token) == false)
+                if (term.Words.Keys.Contains(iTerm.Name) == false)
                 {
-                    term.Words.Add(token, iTerm);
+                    term.Words.Add(iTerm.Name, iTerm);
                 }
 
                 if (found_term == false)
@@ -76,7 +74,7 @@ namespace InformationRetrieval.Index
             return termList.ToList();
         }
  
-        public void Finish()
+        public void Prepare()
         {
             int i = 0;
             foreach (var kgram in kgramDictionary)

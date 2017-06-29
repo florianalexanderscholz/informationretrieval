@@ -12,7 +12,7 @@ namespace InformationRetrieval.Index
         void InsertPostings(List<Token> tokens, string filename, int docId);
         SortedSet<Posting> GetAllDocuments();
         bool GetPosting(string token, out Term term);
-        void PerformSearch(string query);
+        List<Hit> PerformSearch(string query, IQueryFlags queryFlags, int r);
         void Finish();
     }
 }

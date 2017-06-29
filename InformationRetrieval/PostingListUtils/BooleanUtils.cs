@@ -88,6 +88,47 @@ namespace InformationRetrieval.PostingListUtils
             return answerCount;
         }
 
+        public static int AndCount(this SortedSet<string> me, SortedSet<string> other)
+        {
+            if (me == null || other == null)
+            {
+                return 0;
+            }
+
+            int answerCount = 0; ;
+
+            using (var meEnumerator = me.GetEnumerator())
+            {
+                using (var otherEnumerator = other.GetEnumerator())
+                {
+
+                    bool meNext = meEnumerator.MoveNext();
+                    bool otherNext = otherEnumerator.MoveNext();
+
+                    while (meNext == true && otherNext == true)
+                    {
+                        if (meEnumerator.Current.CompareTo(otherEnumerator.Current) == 0)
+                        {
+                            answerCount++;
+                            meNext = meEnumerator.MoveNext();
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                        else if (string.Compare(meEnumerator.Current,
+                                     otherEnumerator.Current, StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            meNext = meEnumerator.MoveNext();
+                        }
+                        else
+                        {
+                            otherNext = otherEnumerator.MoveNext();
+                        }
+                    }
+                }
+            }
+
+            return answerCount;
+        }
+
         public static SortedSet<Index.Posting> AndNot(this SortedSet<Index.Posting> me, SortedSet<Index.Posting> other)
         {
             if (me == null || other == null)

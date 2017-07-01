@@ -90,18 +90,7 @@ namespace InformationRetrieval.Index
             sw.Stop();
             Console.WriteLine("Vector Search: {0}", sw.Elapsed.TotalSeconds);
 
-            Array.Sort(score, docs, new ReverseComparer());
-            List<Hit> hits = new List<Hit>();
-            for (int i = 0; i < vectorSearchFlags.K && score[i] > 0.0001; i++)
-            {
-                hits.Add(new Hit()
-                {
-                    Document = docs[i],
-                    Score = score[i]
-                });
-            }
-
-            return hits;
+            return createRanking(score, docs, vectorSearchFlags.K);
         }
 
         private List<Hit> PerformSearch_Clustering(string query, IQueryFlags queryFlags, bool useLevenshtein, int r)
@@ -148,20 +137,7 @@ namespace InformationRetrieval.Index
             sw.Stop();
             Console.WriteLine("Cluster Pruning: {0}", sw.Elapsed.TotalSeconds);
 
-            Array.Sort(score, docs, new ReverseComparer());
-
-            List<Hit> hits = new List<Hit>();
-            for (int i = 0; i < clusterSearchFlags.B2  && score[i] > 0.0001; i++)
-            {
-                hits.Add(new Hit()
-                {
-                    Document = docs[i],
-                    Score = score[i]
-                });
-                //Console.WriteLine("{0} ({1})", docs[i], score[i]);
-            }
-
-            return hits;
+            return createRanking(score, docs, clusterSearchFlags.B2);
         }
 
 
@@ -187,7 +163,6 @@ namespace InformationRetrieval.Index
             foreach (var doc in documentList.Documents.ToArray())
             {
                 var sortedList = new SortedList<double, Cluster>(new ReverseDuplicateKeyComparer<double>());
-                double score = 0;
 
                 foreach (var cluster in Clusters)
                 {
@@ -198,16 +173,28 @@ namespace InformationRetrieval.Index
                 var matches = sortedList.Take(3);
                 foreach (var cluster in matches)
                 {
-                    //Console.WriteLine("{0}", cluster.Key);
                     cluster.Value.Followers.Add(doc);
-
-
-                    //Console.WriteLine("Add {0} to cluster {1}, scored: {2}", doc.Value.Filename, cluster.Value.Leader.Filename, cluster.Key);
                 }
             }
 
             sw.Stop();
             Console.WriteLine("Done: {0}s", sw.Elapsed.TotalSeconds);
+        }
+
+        private static List<Hit> createRanking(double[] score, string[] docs, int k)
+        {
+            Array.Sort(score, docs, new ReverseComparer());
+            List<Hit> hits = new List<Hit>();
+            for (int i = 0; i < k && score[i] > 0.0001; i++)
+            {
+                hits.Add(new Hit()
+                {
+                    Document = docs[i],
+                    Score = score[i]
+                });
+            }
+
+            return hits;
         }
     }
 }

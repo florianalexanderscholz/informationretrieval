@@ -104,7 +104,7 @@ namespace InformationRetrieval.Index
             }
         }
 
-        public List<string> GetTermsByQuery(string query, KGramList kGramList, int kGram, int r)
+        public List<string> GetTermsByQuery(string query, KGramList kGramList, int kGram, int r, double j, int l)
         {
             List<string> words = query.ToLower().Split(' ').ToList();
             List<string> searchTerms = new List<string>();
@@ -117,7 +117,7 @@ namespace InformationRetrieval.Index
                     Console.WriteLine("Suppose the term {0} is miswritten", word);
                     Console.WriteLine("- Candidates are: ");
 
-                    var candidates = kGramList.GetWords(word, kGram);
+                    var candidates = kGramList.GetWords(word, kGram, j, l);
                     foreach (var cand in candidates)
                     {
                         Console.WriteLine(cand);

@@ -43,7 +43,7 @@ namespace InformationRetrieval.TypoCorrection
             }
         }
 
-        public List<string> GetWords(string token, int k)
+        public List<string> GetWords(string token, int k, double j, int l)
         {
             var kgrams = token.KGrams(k);
             
@@ -58,13 +58,13 @@ namespace InformationRetrieval.TypoCorrection
 
                 foreach (var term in kgramTerm.Words)
                 {
-                    if (Jaccard(kgrams, term.Value.KgramSet) < 0.1)
+                    if (Jaccard(kgrams, term.Value.KgramSet) < j)
                     {
                         continue;
                     }
 
                     var levensthein = LevenshteinDistance.Compute(term.Value.Name, token);
-                    if (levensthein < 6)
+                    if (levensthein < l)
                     {
                         termList.Add(term.Value.Name);
                     }

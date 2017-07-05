@@ -36,6 +36,11 @@ namespace InformationRetrieval
             index.Finish(B1, B2);
         }
 
+        public void RefreshClustering(int B1)
+        {
+            index.CreateClusters(B1);
+        }
+
         private void readAllDocuments(string path)
         {
             var directory = Directory.EnumerateFiles(path);

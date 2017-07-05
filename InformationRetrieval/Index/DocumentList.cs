@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformationRetrieval.Tokenizer;
 
@@ -12,7 +13,7 @@ namespace InformationRetrieval.Index
             documentDictionary.Add(filename, new Document(docId)
             {
                 Filename = filename,
-                Length = tokens.Count
+               
             });
         }
 
@@ -52,6 +53,22 @@ namespace InformationRetrieval.Index
             }
 
             return score / document.Length;
+        }
+
+        public void CalculateLenghts()
+        {
+            foreach (var doc in documentDictionary)
+            {
+                double length = 0.0;
+                foreach (var term in doc.Value.Terms)
+                {
+                    if (term.Postings.TryGetValue(doc.Value.DocId, out Posting value))
+                    {
+                        length = length + Math.Pow(value.Weight, 2);
+                    }
+                }
+                doc.Value.Length = Math.Sqrt(length);
+            }
         }
     }
 }

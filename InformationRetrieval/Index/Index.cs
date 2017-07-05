@@ -19,7 +19,7 @@ namespace InformationRetrieval.Index
     
     public class Index : IIndex
     {
-        public int KGram { get; set; } = 5;
+        public int KGram { get; set; } = 3;
         public KGramList kgramList = new KGramList();
         public TermList termList = new TermList();
         public DocumentList documentList = new DocumentList();
@@ -53,11 +53,11 @@ namespace InformationRetrieval.Index
 
             if (queryFlags is VectorSearchFlags)
             {
-                matches = PerformSearch_Simple(query, queryFlags, false, r);
+                matches = PerformSearch_Simple(query, queryFlags, false);
             }
             else if (queryFlags is ClusterSearchFlags)
             {
-                matches = PerformSearch_Clustering(query, queryFlags, false, r);
+                matches = PerformSearch_Clustering(query, queryFlags, false);
             }
             else
             {
@@ -67,13 +67,13 @@ namespace InformationRetrieval.Index
             return matches;
         }
 
-        private List<Hit> PerformSearch_Simple(string query, IQueryFlags queryFlags, bool useLeveshtein, int r)
+        private List<Hit> PerformSearch_Simple(string query, IQueryFlags queryFlags, bool useLeveshtein)
         {
             var vectorSearchFlags = queryFlags as VectorSearchFlags;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            var searchTerms = termList.GetTermsByQuery(query, kgramList, KGram, r);
+            var searchTerms = termList.GetTermsByQuery(query, kgramList, KGram, queryFlags.R, queryFlags.J, queryFlags.L);
 
             if (searchTerms.Count == 0)
             {
@@ -85,7 +85,7 @@ namespace InformationRetrieval.Index
             foreach (var document in documentList.Documents)
             {
                 docs[document.DocId] = document.Filename;
-                score[document.DocId] = documentList.CalculateScore(termList, document, searchTerms, r);
+                score[document.DocId] = documentList.CalculateScore(termList, document, searchTerms, queryFlags.R);
             }
             sw.Stop();
             Console.WriteLine("Vector Search: {0}", sw.Elapsed.TotalSeconds);
@@ -93,13 +93,13 @@ namespace InformationRetrieval.Index
             return createRanking(score, docs, vectorSearchFlags.K);
         }
 
-        private List<Hit> PerformSearch_Clustering(string query, IQueryFlags queryFlags, bool useLevenshtein, int r)
+        private List<Hit> PerformSearch_Clustering(string query, IQueryFlags queryFlags, bool useLevenshtein)
         {
             var clusterSearchFlags = queryFlags as ClusterSearchFlags;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            var searchTerms = termList.GetTermsByQuery(query, kgramList, KGram, r);
+            var searchTerms = termList.GetTermsByQuery(query, kgramList, KGram, queryFlags.R, queryFlags.J, queryFlags.L);
 
             if (searchTerms.Count == 0)
             {
@@ -115,7 +115,7 @@ namespace InformationRetrieval.Index
                 var cdocument = cluster.Leader;
 
                 docs[cdocument.DocId] = cdocument.Filename;
-                score[cdocument.DocId] = documentList.CalculateScore(termList, cdocument, searchTerms, r);
+                score[cdocument.DocId] = documentList.CalculateScore(termList, cdocument, searchTerms, queryFlags.R);
                
                 clusterSet.Add(score[cdocument.DocId], cluster);
             }
@@ -134,7 +134,7 @@ namespace InformationRetrieval.Index
             foreach (var document in relevantDocuments)
             {
                 docs[document.DocId] = document.Filename;
-                score[document.DocId] = documentList.CalculateScore(termList, document, searchTerms, r);
+                score[document.DocId] = documentList.CalculateScore(termList, document, searchTerms, queryFlags.R);
             }
             sw.Stop();
             Console.WriteLine("Cluster Pruning: {0}", sw.Elapsed.TotalSeconds);
@@ -151,12 +151,22 @@ namespace InformationRetrieval.Index
             kgramList.Prepare();
 
             termList.CalculateScores(documentList);
+            documentList.CalculateLenghts();
 
+            CreateClusters(B1);
+
+            sw.Stop();
+            Console.WriteLine("Done: {0}s", sw.Elapsed.TotalSeconds);
+        }
+
+        public void CreateClusters(int B1)
+        {
             var nCluster = Math.Sqrt(documentList.DocumentCount);
             var allDocs = documentList.Documents.ToArray();
             Random shuffler = new Random();
             shuffler.Shuffle(allDocs);
 
+            Clusters.Clear();
             for (int i = 0; i < nCluster; i++)
             {
                 Clusters.Add(new Cluster(allDocs[i]));
@@ -178,9 +188,6 @@ namespace InformationRetrieval.Index
                     cluster.Value.Followers.Add(doc);
                 }
             }
-
-            sw.Stop();
-            Console.WriteLine("Done: {0}s", sw.Elapsed.TotalSeconds);
         }
 
         private static List<Hit> createRanking(double[] score, string[] docs, int k)

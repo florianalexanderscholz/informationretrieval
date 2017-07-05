@@ -22,18 +22,18 @@ namespace InformationRetrieval
         public double JaccardLimit { get; set; } = 0.1;
         public int LevenshteinLimit { get; set; } = 9;
 
-        public VectorSearchEngine(Container diContainer, string path)
+        public VectorSearchEngine(Container diContainer, string path, int B1, int B2)
         {
             this.index = diContainer.GetInstance<IIndex>();
             this.tokenizer = diContainer.GetInstance<ITokenizer>();
 
             this.readAllDocuments(path);
-            this.offlineProcessing();
+            this.offlineProcessing(B1, B2);
         }
 
-        private void offlineProcessing()
+        private void offlineProcessing(int B1, int B2)
         {
-            index.Finish();
+            index.Finish(B1, B2);
         }
 
         private void readAllDocuments(string path)

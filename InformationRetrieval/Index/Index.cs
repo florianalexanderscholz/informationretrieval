@@ -98,8 +98,10 @@ namespace InformationRetrieval.Index
             var clusterSearchFlags = queryFlags as ClusterSearchFlags;
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            List<string> words = query.ToLower().Split(' ').ToList();
-            if (words.Count == 0)
+
+            var searchTerms = termList.GetTermsByQuery(query, kgramList, KGram, r);
+
+            if (searchTerms.Count == 0)
             {
                 return new List<Hit>();
             }
@@ -113,12 +115,12 @@ namespace InformationRetrieval.Index
                 var cdocument = cluster.Leader;
 
                 docs[cdocument.DocId] = cdocument.Filename;
-                score[cdocument.DocId] = documentList.CalculateScore(termList, cdocument, words, r);
+                score[cdocument.DocId] = documentList.CalculateScore(termList, cdocument, searchTerms, r);
                
                 clusterSet.Add(score[cdocument.DocId], cluster);
             }
 
-            var clusterSubset = clusterSet.Take(clusterSearchFlags.B1);
+            var clusterSubset = clusterSet.Take(clusterSearchFlags.B2);
             List<Document> relevantDocuments = new List<Document>();
             foreach (var c in clusterSubset)
             {
@@ -132,16 +134,16 @@ namespace InformationRetrieval.Index
             foreach (var document in relevantDocuments)
             {
                 docs[document.DocId] = document.Filename;
-                score[document.DocId] = documentList.CalculateScore(termList, document, words, r);
+                score[document.DocId] = documentList.CalculateScore(termList, document, searchTerms, r);
             }
             sw.Stop();
             Console.WriteLine("Cluster Pruning: {0}", sw.Elapsed.TotalSeconds);
 
-            return createRanking(score, docs, clusterSearchFlags.B2);
+            return createRanking(score, docs, clusterSearchFlags.K);
         }
 
 
-        public void Finish()
+        public void Finish(int B1, int B2)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -170,7 +172,7 @@ namespace InformationRetrieval.Index
                     sortedList.Add(sim, cluster);
                 }
 
-                var matches = sortedList.Take(3);
+                var matches = sortedList.Take(B1);
                 foreach (var cluster in matches)
                 {
                     cluster.Value.Followers.Add(doc);

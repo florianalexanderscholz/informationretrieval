@@ -16,8 +16,11 @@ namespace InformationRetrieval
             Container diContainer = new Container();
             initializeDi(diContainer);
 
-            string corpusPath = @"C:\Users\Florian\Documents\inrpraktikum\Documents\Corpus";
-            VectorSearchEngine vectorSearchEngine = new VectorSearchEngine(diContainer, corpusPath);
+            int b1 = 3;
+            int b2 = 3;
+
+            string corpusPath = @"C:\Users\Florian\Downloads\inrpraktikum\Documents\Corpus";
+            VectorSearchEngine vectorSearchEngine = new VectorSearchEngine(diContainer, corpusPath, b1, b2);
 
             while (true)
             {
@@ -39,8 +42,9 @@ namespace InformationRetrieval
                 {
                     queryFlags = new ClusterSearchFlags()
                     {
-                        B1 = 10,
-                        B2 = 10
+                        B1 = b1,
+                        B2 = b2,
+                        K = 10
                     };
 
                     query = readline.Substring(0);

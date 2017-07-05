@@ -11,6 +11,6 @@ namespace InformationRetrieval.Index
     {
         void InsertPostings(List<Token> tokens, string filename, int docId);
         List<Hit> PerformSearch(string query, IQueryFlags queryFlags, int r);
-        void Finish();
+        void Finish(int B1, int B2);
     }
 }
